@@ -30,8 +30,12 @@ const clientDistCandidates = [
 const clientDistPath = clientDistCandidates.find((p) => fs.existsSync(p));
 if (clientDistPath) {
   app.use(express.static(clientDistPath));
-  app.get('*', (_req, res) => {
-    res.sendFile(path.join(clientDistPath, 'index.html'));
+  app.use((req, res, next) => {
+    if (req.method === 'GET' && !req.path.startsWith('/api')) {
+      res.sendFile(path.join(clientDistPath, 'index.html'));
+    } else {
+      next();
+    }
   });
 }
 
