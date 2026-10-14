@@ -1,19 +1,29 @@
 FROM node:20-alpine
 
-# Set working directory
 WORKDIR /app
 
-# Copy package files and install dependencies
-COPY package*.json ./
-RUN npm install --omit=dev
+# Install openssl for Prisma runtime
+RUN apk add --no-cache openssl
 
-# Copy application source code
+# Copy package definitions for npm workspaces
+COPY package*.json ./
+COPY server/package*.json ./server/
+COPY client/package*.json ./client/
+COPY server/prisma ./server/prisma/
+
+# Install dependencies and generate Prisma client
+RUN npm install
+
+# Copy all source files
 COPY . .
 
-# Set environment variables (Cloud Run sets PORT automatically, defaults to 8080)
+# Build server (tsc) and client (vite)
+RUN npm run build
+
+# Cloud Run defaults
 ENV NODE_ENV=production
 ENV PORT=8080
 EXPOSE 8080
 
-# Start application
+# Start application (runs database migrations on start, then launches Express)
 CMD ["npm", "start"]

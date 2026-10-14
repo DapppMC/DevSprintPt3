@@ -1,149 +1,96 @@
-# 🚀 DevSprint Multi-Tenant Container Lab
+# 🏪 Warung Madura Stock & Security Manager (Student 2)
+### DevSprint Multi-Tenant Container Lab on GCP Cloud Run & Supabase
 
-Welcome to the **DevSprint** project! This repository powers a multi-tenant cloud setup on **Google Cloud Platform (GCP)** and **Supabase (PostgreSQL)** designed for independent student development.
+Aplikasi manajemen inventaris, penerimaan barang (*goods receiving*), penjualan, dan pengamanan hak akses berbasis peran (*Role-Based Access Control* & *Dynamic Role Permission Manager*) untuk Warung Madura "Berkah 24 Jam" milik Cak Rofi.
 
 ---
 
-## 🏗️ Architecture Overview
+## 🏗️ Architecture & Cloud Run Mapping
 
-Each student works on their own dedicated Git branch. Pushing to your branch **automatically builds and deploys your own private container on GCP Cloud Run** while sharing a single Supabase database with zero data conflicts:
+* **Branch:** `student2`
+* **Cloud Run Service:** `app-student2`
+* **Assigned Database Schema:** `student2` (Supabase PostgreSQL)
+* **Stack:** React 19 + Tailwind CSS + Vite (SPA Client), Express 5 + TypeScript + Prisma 6 (Backend API)
+* **Containerization:** Node.js 20 Alpine Docker container running both REST API (`/api/*`) and compiled SPA static assets.
 
 ```
-                      GitHub Monorepo
-                             │
-     ┌───────────────┬───────┴───────┬───────────────┐
-     ▼               ▼               ▼               ▼
-   main          student1        student2        student3
- (Instructor)        │               │               │
-     │               │ (git push)    │ (git push)    │ (git push)
-     ▼               ▼               ▼               ▼
-Cloud Run:      Cloud Run:      Cloud Run:      Cloud Run:
- app-main      app-student1    app-student2    app-student3
-     │               │               │               │
-     └───────────────┼───────────────┼───────────────┘
-                     ▼
-          [Shared Supabase Database]
-        ┌─────────────────────────────┐
-        │ ├── schema "main_schema"    │
-        │ ├── schema "student1"       │
-        │ ├── schema "student2"       │
-        │ └── schema "student3"       │
-        └─────────────────────────────┘
+                      GitHub Monorepo (padinadi01/DevSprintPt3)
+                                      │
+                               (git push student2)
+                                      ▼
+                        GCP Cloud Build & Cloud Run
+                               (app-student2)
+                                      │
+                                      ▼
+                        Supabase Shared PostgreSQL
+                               ┌──────────────┐
+                               │ student2.*   │
+                               └──────────────┘
 ```
 
 ---
 
-## 👥 Branch & Service Mapping
+## 🔐 Kredensial Login (Smoke Test)
 
-| Branch | Cloud Run Service | Assigned Schema | Purpose |
-| :--- | :--- | :--- | :--- |
-| **`main`** | `app-main` | `main_schema` | Baseline reference code (Instructor) |
-| **`student1`** | `app-student1` | `student1` | Student 1 workspace |
-| **`student2`** | `app-student2` | `student2` | Student 2 workspace |
-| **`student3`** | `app-student3` | `student3` | Student 3 workspace |
+Sistem menggunakan enkripsi password hash `bcrypt` (C1) dan autentikasi token JWT (C2) dengan antarmuka Quick-Switch untuk kemudahan demonstrasi:
 
----
-
-## 🔒 How Database Schema Isolation Works
-
-You don't need to write complex SQL or worry about corrupting another student's tables.
-
-When your Cloud Run container boots, it receives a `DATABASE_URL` configured for your schema. `server.js` sets the PostgreSQL search path:
-```sql
-SET search_path TO "your_schema", public;
-```
-
-### What this means for you:
-* When you write:
-  ```sql
-  CREATE TABLE notes (...);
-  SELECT * FROM notes;
-  ```
-  PostgreSQL automatically creates and queries **`<your_schema>.notes`**.
-* Even if everyone creates a table named `notes` or `users`, they exist in **completely isolated schemas**. You will never see or overwrite each other's data!
+| Pengguna | Username | PIN / Password | Peran (*Role*) | Akses & Wewenang |
+| :--- | :--- | :--- | :--- | :--- |
+| **Cak Rofi** | `cakrofi` | `123456` | **PEMILIK** | Akses penuh (Omset, Modal, Tambah Produk, Role Permission Manager) |
+| **Udin** | `udin` | `1111` | **STAF** | Kasir & Penerimaan Barang (Harga modal disensor secara dinamis) |
+| **Sari** | `sari` | `2222` | **STAF** | Shift malam: Kasir & Terima Barang |
 
 ---
 
-## 💻 Quickstart for Students
+## 🚀 Fitur Utama & Kepatuhan Blok A - D
 
-### 1. Clone the repository
-```bash
-git clone https://github.com/padinadi01/DevSprintPt3.git
-cd DevSprintPt3
-```
-
-### 2. Switch to your assigned branch
-```bash
-# If you are Student 1:
-git checkout student1
-
-# If you are Student 2:
-git checkout student2
-
-# If you are Student 3:
-git checkout student3
-```
-
-### 3. Set up environment variables locally
-Create a `.env` file in the root directory (based on `.env.example`):
-```env
-PORT=8080
-APP_NAME=Student 1 Service
-DATABASE_URL=postgresql://postgres.kdepzstxneeufegoogrf:zhZFsaubb3efb161@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres?schema=student1
-```
-*(Replace `?schema=student1` with your assigned schema name).*
-
-### 4. Install dependencies and run locally
-```bash
-npm install
-npm run dev
-```
-Open [http://localhost:8080](http://localhost:8080) in your browser. You will see the live interactive dashboard and test adding items to your database!
+1. **Blok A (Modul Barang Masuk & Rekonsiliasi Pesanan)**:
+   - Konversi satuan beli ke satuan dasar (dus/renteng/bal ke bungkus/sachet/botol).
+   - Penerimaan parsial, pencatatan barang ditolak (*defect*), dan kuantitas bonus gratis.
+   - Idempotency proteksi klik ganda (*double-submit*).
+   - Snapshot HPP modal terkunci per penerimaan barang.
+2. **Blok B (Keamanan & Matriks Guard)**:
+   - Hash PIN dengan `bcrypt` pada database (`passwordHash`).
+   - Anti-impersonasi: Staf tidak bisa mencatut nama staf lain saat mencatat penerimaan barang.
+   - Pembatasan laju (*Rate Limiting*) proteksi serangan *brute force*.
+3. **Blok C (Dynamic Role Permission Manager)**:
+   - Matriks perizinan dinamis disimpan di database (`RolePermission`).
+   - Pemilik dapat mengatur dan mencabut wewenang Staf (seperti `cost:view`) secara seketika melalui antarmuka web.
+   - Penolakan HTTP 403 Forbidden bila aksi terlarang diakses.
+4. **Blok D (Ship ke Live)**:
+   - Secret dikelola melalui environment variable (`DATABASE_URL`, `JWT_SECRET`), bukan di dalam commit.
+   - Aplikasi membaca `PORT` dari environment (Cloud Run port `8080`).
+   - Migrasi database dan inisialisasi data otomatis dijalankan pada saat *startup* container (`run-migrations.cjs`).
+   - Endpoint kesehatan `/api/health` aktif untuk smoke test.
 
 ---
 
-## 🚀 How to Deploy Your Changes
+## 🧪 Smoke Test Checklist
 
-Deploying is as simple as running `git push`:
+Setelah aplikasi live di Cloud Run:
 
-```bash
-# 1. Stage and commit your code
-git add .
-git commit -m "Add new student feature"
-
-# 2. Push to your assigned branch
-git push origin student1    # (replace student1 with your branch)
-```
-
-**That's it!** Google Cloud Build will automatically detect your push, build your Docker container, and deploy it to Cloud Run in about **90 seconds**.
-
----
-
-## 📡 Included API Endpoints
-
-The baseline project comes with ready-to-use REST API endpoints:
-
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `GET` | `/` | Web dashboard with live schema information & CRUD UI |
-| `GET` | `/api/health` | Health check for Cloud Run monitoring |
-| `GET` | `/api/schema-info` | Returns current database user, active schema, and tables |
-| `GET` | `/api/notes` | Returns all items from your schema's `notes` table |
-| `POST` | `/api/notes` | Inserts a new note (`{"title": "...", "content": "..."}`) |
-| `DELETE` | `/api/notes/:id` | Deletes a note by its ID |
-
----
-
-## 🛠️ Modifying the Application
-
-To add your own database table or API:
-1. Open [server.js](file:///c:/Users/micha/OneDrive/Documents/Projects/DevSprint/server.js).
-2. Use standard SQL with the connection pool:
-   ```javascript
-   // Example: Fetching custom data
-   app.get('/api/my-data', async (req, res) => {
-     const result = await pool.query('SELECT * FROM my_table;');
-     res.json(result.rows);
-   });
+1. **Cek Status Kesehatan Server**:
+   ```bash
+   curl -i https://<cloud-run-url>/api/health
+   # Ekspektasi: HTTP 200 {"status":"ok"}
    ```
-3. Commit and push to your branch!
+2. **Uji Login Pemilik**:
+   - Buka browser ke URL live.
+   - Klik kartu login / tombol `👑 Rofi` (PIN: `123456`).
+   - Pastikan masuk ke Dashboard dengan data penjualan dan menu manajemen aktif.
+3. **Uji Proteksi Staf**:
+   - Klik tombol cepat `👤 Udin` (PIN: `1111`).
+   - Pastikan harga modal pada menu **Produk** menampilkan `🔒 Terkunci`.
+4. **Uji Dynamic Permission Toggle**:
+   - Kembali ke akun `👑 Rofi` -> buka menu **Manajemen Izin**.
+   - Centang izin `Lihat Harga Modal` (`cost:view`) untuk Staf -> klik **Simpan Hak Akses**.
+   - Beralih ke `👤 Udin` -> buka menu **Produk**: harga modal seketika terbuka dan menampilkan nominal rupiah.
+
+---
+
+## 📚 Dokumentasi Lengkap
+
+* [`progres.md`](./progres.md): Dokumentasi teknis konteks AI Agent (Arsitektur, DTO, Invariant, 49/49 Vitest PASS).
+* [`LAPORAN_PROYEK.md`](./LAPORAN_PROYEK.md): Laporan komprehensif untuk pengembang, manajer, dan fasilitator.
+* [`GUARD.md`](./GUARD.md): Dokumen audit keamanan dan matriks perlindungan endpoint.
+* [`PERMISSIONS.md`](./PERMISSIONS.md): Spesifikasi izin sistem dan pemetaan role.
