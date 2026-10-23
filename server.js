@@ -1,17 +1,23 @@
-// Entrypoint for Cloud Run and GitHub Actions verification
-require('dotenv').config();
-const path = require('path');
-const fs = require('fs');
+// Entrypoint for Cloud Run, Docker containers, and syntax verification
+import 'dotenv/config';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+import { createRequire } from 'module';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const require = createRequire(import.meta.url);
 
 async function main() {
-  // 1. Run migrations if script exists
+  // 1. Run migrations if script exists (non-fatal, resilient to offline/cold Supabase)
   const migrationRunner = path.resolve(__dirname, 'server/scripts/run-migrations.cjs');
   if (fs.existsSync(migrationRunner)) {
     try {
       const { execSync } = require('child_process');
       execSync(`node "${migrationRunner}"`, { stdio: 'inherit' });
     } catch (err) {
-      console.error('[Startup] Migration runner notice:', err.message);
+      console.warn('[Startup] Migration runner warning (non-fatal, server continues):', err.message);
     }
   }
 
@@ -24,7 +30,7 @@ async function main() {
   }
 }
 
-// Only execute when run directly (not during syntax check)
-if (require.main === module) {
-  main();
-}
+// Execute when run
+main().catch((err) => {
+  console.error('[Startup] Server startup error:', err);
+});
