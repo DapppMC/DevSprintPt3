@@ -13,6 +13,7 @@ import type {
   UpdateProductInput,
 } from '../validators/product.validator';
 import { FALLBACK_PRODUCTS } from '../lib/fallback-data';
+import { getDatabaseStatus, markDatabaseDown, markDatabaseUp } from '../lib/db-health';
 
 const PRODUCT_NOT_FOUND = 'Produk tidak ditemukan.';
 const SKU_ALREADY_USED = 'SKU sudah digunakan oleh produk lain.';
@@ -43,10 +44,40 @@ export function toProductDto(
   return dto;
 }
 
+function getFallbackProducts(
+  filter: ListProductsFilter,
+  options?: { hidePurchasePrice?: boolean },
+): ProductDto[] {
+  let list = [...FALLBACK_PRODUCTS];
+  if (filter.search) {
+    const q = filter.search.toLowerCase();
+    list = list.filter(
+      (p) =>
+        p.name.toLowerCase().includes(q) ||
+        p.sku.toLowerCase().includes(q) ||
+        p.category.toLowerCase().includes(q),
+    );
+  }
+  if (filter.inStock) {
+    list = list.filter((p) => p.stock > 0);
+  }
+  if (filter.activeOnly) {
+    list = list.filter((p) => p.isActive);
+  }
+  if (options?.hidePurchasePrice) {
+    list = list.map((p) => ({ ...p, purchasePrice: undefined }));
+  }
+  return list;
+}
+
 export async function listProducts(
   filter: ListProductsFilter,
   options?: { hidePurchasePrice?: boolean },
 ): Promise<ProductDto[]> {
+  if (!getDatabaseStatus()) {
+    return getFallbackProducts(filter, options);
+  }
+
   const where: Prisma.ProductWhereInput = {};
 
   if (filter.search) {
@@ -65,32 +96,15 @@ export async function listProducts(
 
   try {
     const products = await db.product.findMany({ where, orderBy: { name: 'asc' } });
+    markDatabaseUp();
     return products.map((p) => toProductDto(p, options));
   } catch (err) {
     console.warn(
-      '[Product] Database query failed, returning fallback products:',
+      '[Product] Database query failed, activating fast fallback products:',
       (err as Error).message,
     );
-    let list = [...FALLBACK_PRODUCTS];
-    if (filter.search) {
-      const q = filter.search.toLowerCase();
-      list = list.filter(
-        (p) =>
-          p.name.toLowerCase().includes(q) ||
-          p.sku.toLowerCase().includes(q) ||
-          p.category.toLowerCase().includes(q),
-      );
-    }
-    if (filter.inStock) {
-      list = list.filter((p) => p.stock > 0);
-    }
-    if (filter.activeOnly) {
-      list = list.filter((p) => p.isActive);
-    }
-    if (options?.hidePurchasePrice) {
-      list = list.map((p) => ({ ...p, purchasePrice: undefined }));
-    }
-    return list;
+    markDatabaseDown();
+    return getFallbackProducts(filter, options);
   }
 }
 
@@ -98,14 +112,24 @@ export async function getProduct(
   id: string,
   options?: { hidePurchasePrice?: boolean },
 ): Promise<ProductDto> {
+  if (!getDatabaseStatus()) {
+    const fallback = FALLBACK_PRODUCTS.find((p) => p.id === id || p.sku === id);
+    if (!fallback) throw new NotFoundError(PRODUCT_NOT_FOUND);
+    return options?.hidePurchasePrice ? { ...fallback, purchasePrice: undefined } : fallback;
+  }
+
   try {
     const product = await db.product.findUnique({ where: { id } });
-    if (product) return toProductDto(product, options);
+    if (product) {
+      markDatabaseUp();
+      return toProductDto(product, options);
+    }
   } catch (err) {
     console.warn(
       '[Product] Database query failed during getProduct, checking fallback:',
       (err as Error).message,
     );
+    markDatabaseDown();
   }
 
   const fallback = FALLBACK_PRODUCTS.find((p) => p.id === id || p.sku === id);

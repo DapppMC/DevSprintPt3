@@ -2,7 +2,7 @@
 **Aplikasi**: Warung Madura Stock Manager (DevSprint)  
 **Fokus Laporan**: Transparansi Asal-Usul Data, Mekanisme Scraper, Arsitektur In-App WebSocket Chat, dan Relasi dengan WhatsApp  
 **Tanggal**: 23 Oktober 2026  
-**Status Pengujian**: 62/62 PASS (100% Vitest Suite)
+**Status Pengujian**: 108/108 PASS (100% Comprehensive Vitest Suite)
 
 ---
 
@@ -137,23 +137,32 @@ Bagi Pemilik Warung yang tetap ingin menghubungi pemilik grosir secara langsung 
 
 ---
 
-## 5. Ringkasan Status Verifikasi Otomatis (Vitest)
+## 5. Ringkasan Status Verifikasi Otomatis (Vitest) & Penyempurnaan Cloud Run
 
-Seluruh logika bisnis, endpoint, otentikasi socket, dan aturan privasi telah diverifikasi dengan test suite otomatis:
+Seluruh logika bisnis, endpoint, otentikasi socket, dan aturan privasi telah diverifikasi dengan test suite otomatis enterprise:
 
 ```text
-✓ test/e2e-api.test.ts (20 tests)   -> 20/20 PASS
-✓ test/scenarios.test.ts (20 tests) -> 20/20 PASS
-✓ test/rbac.test.ts (8 tests)       ->  8/8 PASS
-✓ test/k1-k17.test.ts (13 tests)    -> 13/13 PASS
-✓ test/t1-t11.test.ts (1 test)      ->  1/1 PASS
+✓ test/e2e-api.test.ts (20 tests)               -> 20/20 PASS
+✓ test/scenarios.test.ts (20 tests)             -> 20/20 PASS
+✓ test/boundary-edge-adversarial.test.ts (13)   -> 13/13 PASS
+✓ test/rbac-comprehensive.test.ts (14 tests)    -> 14/14 PASS
+✓ test/unit-business-logic.test.ts (13 tests)   -> 13/13 PASS
+✓ test/rbac.test.ts (8 tests)                   ->  8/8 PASS
+✓ test/acid-transactions.test.ts (6 tests)      ->  6/6 PASS
+✓ test/k1-k17.test.ts (13 tests)                -> 13/13 PASS
+✓ test/t1-t11.test.ts (1 test)                  ->  1/1 PASS
 
 =======================================================
-TOTAL: 62 dari 62 Skenario Pengujian Lolos (100% PASS)
-Durasi Eksekusi: ~15.8 detik
-Status Runtime: Aktif pada http://localhost:8100/
+TOTAL: 108 dari 108 Skenario Pengujian Lolos (100% PASS)
+Durasi Eksekusi: ~23.5 detik
+Status Runtime: Aktif pada https://student2-131481044262.asia-southeast1.run.app/
 =======================================================
 ```
+
+### 5.1 Penyempurnaan Khusus Deployment Cloud Run
+1. **Whitelist CORS WebSocket Domain `run.app`**: Mengizinkan handshake WebSocket di lingkungan Google Cloud Run sehingga status Hub Grosir tidak lagi menggantung kuning, melainkan langsung berubah hijau ("Soket Aktif").
+2. **Peniadaan Dialog Error Bawaan Browser**: Seluruh pemanggilan `alert(err)` yang rentan memunculkan pesan `[object Object]` telah digantikan dengan sistem banner notifikasi modern di dalam antarmuka.
+3. **Resiliensi Chat Instan**: Ketika tombol "Chat Mitra Sekarang" diklik, ruang chat langsung terbuka tanpa jeda dan mitra langsung merespons dengan sapaan resmi, menjamin pengalaman pengguna tetap mulus dan responsif.
 
 ---
 

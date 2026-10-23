@@ -5,6 +5,7 @@ import type { LoginInput } from '../validators/auth.validator';
 import type { AuthResponseDto, UserDto } from '../types/dto';
 import type { User } from '@prisma/client';
 import { getRolePermissions } from './permission.service';
+import { getDatabaseStatus, markDatabaseDown, markDatabaseUp } from '../lib/db-health';
 
 export const FALLBACK_USERS = [
   {
@@ -54,20 +55,26 @@ export function toUserDto(user: User, permissions?: string[]): UserDto {
 
 export async function login(input: LoginInput): Promise<AuthResponseDto> {
   let user: User | null = null;
-  let isDbFallback = false;
+  let isDbFallback = !getDatabaseStatus();
 
-  try {
-    user = await db.user.findFirst({
-      where: {
-        username: { equals: input.username, mode: 'insensitive' },
-      },
-    });
-  } catch (err) {
-    console.warn(
-      '[Auth] Database connection issue, activating resilient demo fallback:',
-      (err as Error).message,
-    );
-    isDbFallback = true;
+  if (!isDbFallback) {
+    try {
+      user = await db.user.findFirst({
+        where: {
+          username: { equals: input.username, mode: 'insensitive' },
+        },
+      });
+      if (user) {
+        markDatabaseUp();
+      }
+    } catch (err) {
+      console.warn(
+        '[Auth] Database connection issue, activating fast demo fallback:',
+        (err as Error).message,
+      );
+      markDatabaseDown();
+      isDbFallback = true;
+    }
   }
 
   // Fallback if DB is offline or user not found in DB but exists in demo seed
@@ -131,15 +138,19 @@ export async function login(input: LoginInput): Promise<AuthResponseDto> {
 
 export async function getMe(userId: string): Promise<UserDto> {
   let user: User | null = null;
-  try {
-    user = await db.user.findUnique({
-      where: { id: userId },
-    });
-  } catch (err) {
-    console.warn(
-      '[Auth] Database error during getMe, attempting demo fallback:',
-      (err as Error).message,
-    );
+  if (getDatabaseStatus()) {
+    try {
+      user = await db.user.findUnique({
+        where: { id: userId },
+      });
+      if (user) markDatabaseUp();
+    } catch (err) {
+      console.warn(
+        '[Auth] Database error during getMe, attempting demo fallback:',
+        (err as Error).message,
+      );
+      markDatabaseDown();
+    }
   }
 
   if (!user) {

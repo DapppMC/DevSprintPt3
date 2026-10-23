@@ -5,8 +5,13 @@ import type { DashboardDto } from '../types/dto';
 import { toProductDto } from './product.service';
 import { saleSummaryInclude, toSaleSummaryDto } from './sale.service';
 import { getFallbackDashboard } from '../lib/fallback-data';
+import { getDatabaseStatus, markDatabaseDown, markDatabaseUp } from '../lib/db-health';
 
 export async function getDashboard(options?: { maskFinancials?: boolean }): Promise<DashboardDto> {
+  if (!getDatabaseStatus()) {
+    return getFallbackDashboard(options?.maskFinancials);
+  }
+
   try {
     const now = new Date();
     const lowStockWhere = { stock: { lte: LOW_STOCK_THRESHOLD }, isActive: true };
@@ -36,6 +41,8 @@ export async function getDashboard(options?: { maskFinancials?: boolean }): Prom
         }),
       ]);
 
+    markDatabaseUp();
+
     return {
       totalProducts,
       totalUnits: stockSum._sum.stock ?? 0,
@@ -49,9 +56,10 @@ export async function getDashboard(options?: { maskFinancials?: boolean }): Prom
     };
   } catch (err) {
     console.warn(
-      '[Dashboard] Database query failed, activating demo fallback dashboard:',
+      '[Dashboard] Database query failed, activating fast demo fallback:',
       (err as Error).message,
     );
+    markDatabaseDown();
     return getFallbackDashboard(options?.maskFinancials);
   }
 }

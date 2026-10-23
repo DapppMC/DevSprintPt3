@@ -1,6 +1,7 @@
 import { db } from "../lib/db.js";
 import { ForbiddenError, NotFoundError } from "../lib/errors.js";
 import { FALLBACK_BUSINESSES } from "../lib/fallback-data";
+import { getDatabaseStatus, markDatabaseDown, markDatabaseUp } from "../lib/db-health.js";
 
 export interface NearbyQuery {
   latitude: number;
@@ -76,43 +77,52 @@ export class NearbyService {
     const bbox = this.getBoundingBox(query.latitude, query.longitude, radius);
 
     let businesses: any[] = [];
-    try {
-      businesses = await db.business.findMany({
-        where: {
-          publicLat: {
-            gte: bbox.minLat,
-            lte: bbox.maxLat,
-          },
-          publicLng: {
-            gte: bbox.minLng,
-            lte: bbox.maxLng,
-          },
-          ...(query.role ? { role: query.role.toUpperCase() } : {}),
-          ...(query.commodity
-            ? {
-                catalogItems: {
-                  some: {
-                    commodity: {
-                      contains: query.commodity.toUpperCase(),
-                    },
-                  },
-                },
-              }
-            : {}),
-        },
-        include: {
-          catalogItems: true,
-        },
-      });
-    } catch (err) {
-      console.warn(
-        '[Nearby] Database query failed, returning fallback businesses:',
-        (err as Error).message,
-      );
+    if (!getDatabaseStatus()) {
       businesses = FALLBACK_BUSINESSES.map((b) => ({
         ...b,
         catalogItems: b.catalog,
       }));
+    } else {
+      try {
+        businesses = await db.business.findMany({
+          where: {
+            publicLat: {
+              gte: bbox.minLat,
+              lte: bbox.maxLat,
+            },
+            publicLng: {
+              gte: bbox.minLng,
+              lte: bbox.maxLng,
+            },
+            ...(query.role ? { role: query.role.toUpperCase() } : {}),
+            ...(query.commodity
+              ? {
+                  catalogItems: {
+                    some: {
+                      commodity: {
+                        contains: query.commodity.toUpperCase(),
+                      },
+                    },
+                  },
+                }
+              : {}),
+          },
+          include: {
+            catalogItems: true,
+          },
+        });
+        markDatabaseUp();
+      } catch (err) {
+        console.warn(
+          '[Nearby] Database query failed, returning fallback businesses:',
+          (err as Error).message,
+        );
+        markDatabaseDown();
+        businesses = FALLBACK_BUSINESSES.map((b) => ({
+          ...b,
+          catalogItems: b.catalog,
+        }));
+      }
     }
 
     const results: NearbyBusinessResult[] = [];

@@ -11,6 +11,7 @@ import {
   FALLBACK_PURCHASE_ORDERS,
   FALLBACK_PURCHASE_ORDER_DETAILS,
 } from '../lib/fallback-data';
+import { getDatabaseStatus, markDatabaseDown, markDatabaseUp } from '../lib/db-health';
 
 export interface CreatePurchaseOrderLineInput {
   productId: string;
@@ -59,6 +60,14 @@ export async function generateOrderNumber(tx: Prisma.TransactionClient, now: Dat
 export async function listPurchaseOrders(filter?: {
   status?: PurchaseOrderStatus;
 }): Promise<PurchaseOrderSummaryDto[]> {
+  if (!getDatabaseStatus()) {
+    let list = [...FALLBACK_PURCHASE_ORDERS];
+    if (filter?.status) {
+      list = list.filter((po) => po.status === filter.status);
+    }
+    return list;
+  }
+
   const where: Prisma.PurchaseOrderWhereInput = {};
   if (filter?.status) {
     where.status = filter.status;
@@ -70,12 +79,14 @@ export async function listPurchaseOrders(filter?: {
       orderBy: { createdAt: 'desc' },
       include: poSummaryInclude,
     });
+    markDatabaseUp();
     return orders.map(toPurchaseOrderSummaryDto);
   } catch (err) {
     console.warn(
-      '[PurchaseOrder] Database query failed, returning fallback POs:',
+      '[PurchaseOrder] Database query failed, activating fast fallback POs:',
       (err as Error).message,
     );
+    markDatabaseDown();
     let list = [...FALLBACK_PURCHASE_ORDERS];
     if (filter?.status) {
       list = list.filter((po) => po.status === filter.status);
@@ -85,6 +96,14 @@ export async function listPurchaseOrders(filter?: {
 }
 
 export async function getPurchaseOrder(id: string): Promise<PurchaseOrderDetailDto> {
+  if (!getDatabaseStatus()) {
+    const fallback =
+      FALLBACK_PURCHASE_ORDER_DETAILS[id] ||
+      Object.values(FALLBACK_PURCHASE_ORDER_DETAILS).find((p) => p.orderNumber === id);
+    if (!fallback) throw new NotFoundError('Pesanan tidak ditemukan.');
+    return fallback;
+  }
+
   try {
     const po = await db.purchaseOrder.findUnique({
       where: { id },
@@ -106,6 +125,7 @@ export async function getPurchaseOrder(id: string): Promise<PurchaseOrderDetailD
     });
 
     if (po) {
+      markDatabaseUp();
       const lines: PurchaseOrderLineDto[] = po.lines.map((line) => ({
         id: line.id,
         productId: line.productId,
@@ -153,9 +173,12 @@ export async function getPurchaseOrder(id: string): Promise<PurchaseOrderDetailD
       '[PurchaseOrder] Database query failed during getPurchaseOrder, checking fallback:',
       (err as Error).message,
     );
+    markDatabaseDown();
   }
 
-  const fallback = FALLBACK_PURCHASE_ORDER_DETAILS[id] || Object.values(FALLBACK_PURCHASE_ORDER_DETAILS).find(p => p.orderNumber === id);
+  const fallback =
+    FALLBACK_PURCHASE_ORDER_DETAILS[id] ||
+    Object.values(FALLBACK_PURCHASE_ORDER_DETAILS).find((p) => p.orderNumber === id);
   if (!fallback) throw new NotFoundError('Pesanan tidak ditemukan.');
   return fallback;
 }

@@ -31,7 +31,10 @@ export function initSocketServer(httpServer: HttpServer) {
           origin.includes("localhost") ||
           origin.includes("127.0.0.1") ||
           origin.includes("padinadi") ||
-          origin.includes("warungmadura")
+          origin.includes("warungmadura") ||
+          origin.includes("run.app") ||
+          origin.includes("github.dev") ||
+          origin.includes("gitpod.io")
         ) {
           callback(null, true);
         } else {

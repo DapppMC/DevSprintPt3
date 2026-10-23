@@ -17,6 +17,7 @@ import {
   FALLBACK_GOODS_RECEIPTS,
   FALLBACK_GOODS_RECEIPT_DETAILS,
 } from '../lib/fallback-data';
+import { getDatabaseStatus, markDatabaseDown, markDatabaseUp } from '../lib/db-health';
 
 export interface CreateGoodsReceiptLineInput {
   productId: string;
@@ -80,6 +81,14 @@ export async function generateReceiptNumber(tx: Prisma.TransactionClient, now: D
 export async function listGoodsReceipts(filter?: {
   supplierId?: string;
 }): Promise<GoodsReceiptSummaryDto[]> {
+  if (!getDatabaseStatus()) {
+    let list = [...FALLBACK_GOODS_RECEIPTS];
+    if (filter?.supplierId) {
+      list = list.filter((gr) => gr.supplierId === filter.supplierId);
+    }
+    return list;
+  }
+
   const where: Prisma.GoodsReceiptWhereInput = {};
   if (filter?.supplierId) {
     where.supplierId = filter.supplierId;
@@ -91,12 +100,14 @@ export async function listGoodsReceipts(filter?: {
       orderBy: { createdAt: 'desc' },
       include: grSummaryInclude,
     });
+    markDatabaseUp();
     return receipts.map(toGoodsReceiptSummaryDto);
   } catch (err) {
     console.warn(
-      '[GoodsReceipt] Database query failed, returning fallback GRs:',
+      '[GoodsReceipt] Database query failed, activating fast fallback GRs:',
       (err as Error).message,
     );
+    markDatabaseDown();
     let list = [...FALLBACK_GOODS_RECEIPTS];
     if (filter?.supplierId) {
       list = list.filter((gr) => gr.supplierId === filter.supplierId);
@@ -106,6 +117,14 @@ export async function listGoodsReceipts(filter?: {
 }
 
 export async function getGoodsReceipt(id: string): Promise<GoodsReceiptDetailDto> {
+  if (!getDatabaseStatus()) {
+    const fallback =
+      FALLBACK_GOODS_RECEIPT_DETAILS[id] ||
+      Object.values(FALLBACK_GOODS_RECEIPT_DETAILS).find((g) => g.receiptNumber === id);
+    if (!fallback) throw new NotFoundError('Penerimaan barang tidak ditemukan.');
+    return fallback;
+  }
+
   try {
     const gr = await db.goodsReceipt.findUnique({
       where: { id },
@@ -121,6 +140,7 @@ export async function getGoodsReceipt(id: string): Promise<GoodsReceiptDetailDto
     });
 
     if (gr) {
+      markDatabaseUp();
       const lines: GoodsReceiptLineDto[] = gr.lines.map((line) => ({
         id: line.id,
         productId: line.productId,
@@ -160,6 +180,7 @@ export async function getGoodsReceipt(id: string): Promise<GoodsReceiptDetailDto
       '[GoodsReceipt] Database query failed during getGoodsReceipt, checking fallback:',
       (err as Error).message,
     );
+    markDatabaseDown();
   }
 
   const fallback =
