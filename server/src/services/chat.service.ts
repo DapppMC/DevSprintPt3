@@ -1,5 +1,6 @@
 import { db } from "../lib/db.js";
 import { ForbiddenError, NotFoundError, ConflictError } from "../lib/errors.js";
+import { getDatabaseStatus } from "../lib/db-health.js";
 import {
   getMemoryConversation,
   getMemoryConversationsForUser,
@@ -22,6 +23,12 @@ export class ChatService {
   static async getOrCreateConversation(initiatorUserId: string, targetUserId: string) {
     if (initiatorUserId === targetUserId) {
       throw new ConflictError("Tidak bisa membuat percakapan dengan diri sendiri");
+    }
+
+    if (!getDatabaseStatus()) {
+      const userA = { id: initiatorUserId, name: 'Pengguna', username: 'user', role: 'PEMILIK' };
+      const userB = { id: targetUserId, name: 'Mitra', username: 'mitra', role: 'STAF' };
+      return getOrCreateMemoryConversation(userA, userB);
     }
 
     try {
@@ -117,6 +124,11 @@ export class ChatService {
     clientMessageId: string,
     body: string
   ) {
+    if (!getDatabaseStatus()) {
+      const sender = { id: senderId, name: 'User', username: 'user' };
+      return sendMemoryMessage(conversationId, sender, clientMessageId, body) as any;
+    }
+
     // 1. Cek keanggotaan anti-IDOR (K8)
     await this.assertMember(conversationId, senderId);
 
@@ -173,6 +185,10 @@ export class ChatService {
    * Mengambil riwayat pesan sejak kursor tertentu (K9)
    */
   static async getMessages(conversationId: string, userId: string, afterSeqId?: number) {
+    if (!getDatabaseStatus()) {
+      return getMemoryMessages(conversationId, afterSeqId);
+    }
+
     // Anti-IDOR (K8)
     await this.assertMember(conversationId, userId);
 
@@ -201,6 +217,10 @@ export class ChatService {
    * Mengambil daftar percakapan aktif milik seorang user
    */
   static async listUserConversations(userId: string) {
+    if (!getDatabaseStatus()) {
+      return getMemoryConversationsForUser(userId);
+    }
+
     try {
       const list = await db.conversation.findMany({
         where: {

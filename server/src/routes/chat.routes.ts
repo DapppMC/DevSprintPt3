@@ -5,6 +5,7 @@ import { db } from "../lib/db.js";
 import { hashPassword } from "../lib/auth-crypto.js";
 import { FALLBACK_BUSINESSES } from "../lib/fallback-data.js";
 import { getMemoryConversation } from "../lib/in-memory-chat.js";
+import { getDatabaseStatus } from "../lib/db-health.js";
 
 const router = Router();
 
@@ -47,13 +48,15 @@ router.post("/start-with-business/:businessId", async (req: Request, res: Respon
     const businessId = req.params.businessId as string;
 
     let business: any = null;
-    try {
-      business = await db.business.findUnique({
-        where: { id: businessId },
-        include: { user: true },
-      });
-    } catch {
-      // Fallback below
+    if (getDatabaseStatus()) {
+      try {
+        business = await db.business.findUnique({
+          where: { id: businessId },
+          include: { user: true },
+        });
+      } catch {
+        // Fallback below
+      }
     }
 
     if (!business) {
@@ -69,23 +72,25 @@ router.post("/start-with-business/:businessId", async (req: Request, res: Respon
 
     if (!partnerUserId) {
       partnerUserId = `user-mitra-${business.id}`;
-      try {
-        const sanitizedUsername = `mitra_${business.id.slice(0, 8)}`;
-        let partnerUser = await db.user.findUnique({ where: { username: sanitizedUsername } });
-        if (!partnerUser) {
-          partnerUser = await db.user.create({
-            data: {
-              username: sanitizedUsername,
-              name: business.name,
-              passwordHash: await hashPassword("mitra12345"),
-              role: "STAF",
-              isActive: true,
-            },
-          });
+      if (getDatabaseStatus()) {
+        try {
+          const sanitizedUsername = `mitra_${business.id.slice(0, 8)}`;
+          let partnerUser = await db.user.findUnique({ where: { username: sanitizedUsername } });
+          if (!partnerUser) {
+            partnerUser = await db.user.create({
+              data: {
+                username: sanitizedUsername,
+                name: business.name,
+                passwordHash: await hashPassword("mitra12345"),
+                role: "STAF",
+                isActive: true,
+              },
+            });
+          }
+          partnerUserId = partnerUser.id;
+        } catch {
+          partnerUserId = `user-mitra-${business.id}`;
         }
-        partnerUserId = partnerUser.id;
-      } catch {
-        partnerUserId = `user-mitra-${business.id}`;
       }
     }
 
@@ -101,30 +106,32 @@ router.post("/start-with-business/:businessId", async (req: Request, res: Respon
     }
 
     // Ambil percakapan lengkap dari DB jika tersedia
-    try {
-      const fullConv = await db.conversation.findUnique({
-        where: { id: conversation.id },
-        include: {
-          members: {
-            include: {
-              user: { select: { id: true, name: true, username: true, role: true } },
+    if (getDatabaseStatus()) {
+      try {
+        const fullConv = await db.conversation.findUnique({
+          where: { id: conversation.id },
+          include: {
+            members: {
+              include: {
+                user: { select: { id: true, name: true, username: true, role: true } },
+              },
+            },
+            messages: {
+              take: 20,
+              orderBy: { createdAt: "asc" },
+              include: {
+                sender: { select: { id: true, name: true, username: true } },
+              },
             },
           },
-          messages: {
-            take: 20,
-            orderBy: { createdAt: "asc" },
-            include: {
-              sender: { select: { id: true, name: true, username: true } },
-            },
-          },
-        },
-      });
-      if (fullConv) {
-        res.json(fullConv);
-        return;
+        });
+        if (fullConv) {
+          res.json(fullConv);
+          return;
+        }
+      } catch {
+        // Fallback
       }
-    } catch {
-      // Fallback
     }
 
     const memConv = getMemoryConversation(conversation.id);
