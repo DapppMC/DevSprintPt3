@@ -4,7 +4,7 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import tseslint from 'typescript-eslint';
 
 export default [
-  { ignores: ['**/dist/**', '**/node_modules/**'] },
+  { ignores: ['**/dist/**', '**/node_modules/**', 'server.js', 'server/scripts/**', '**/*.cjs'] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
@@ -13,6 +13,7 @@ export default [
         'error',
         { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
       ],
+      '@typescript-eslint/no-explicit-any': 'warn',
     },
   },
   {

@@ -30,7 +30,7 @@ export function SaleDetailPage() {
       {sale && (
         <div className={`${cardClass} overflow-hidden`}>
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-slate-200">
+            <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-800">
               <thead className={tableHeadClass}>
                 <tr>
                   <th className={thClass}>Produk</th>
@@ -39,24 +39,24 @@ export function SaleDetailPage() {
                   <th className={`${thClass} text-right`}>Subtotal</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 bg-white dark:bg-slate-900/60">
                 {sale.items.map((item) => (
-                  <tr key={item.id}>
+                  <tr key={item.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50">
                     <td className={tdClass}>
-                      <span className="font-medium text-slate-900">{item.productName}</span>
-                      <span className="ml-2 text-xs text-slate-400">{item.productSku}</span>
+                      <span className="font-medium text-slate-900 dark:text-slate-100">{item.productName}</span>
+                      <span className="ml-2 font-mono text-xs text-slate-400 dark:text-slate-500">{item.productSku}</span>
                     </td>
-                    <td className={`${tdClass} text-right`}>{item.quantity}</td>
-                    <td className={`${tdClass} text-right`}>{formatRupiah(item.unitPrice)}</td>
-                    <td className={`${tdClass} text-right`}>{formatRupiah(item.subtotal)}</td>
+                    <td className={`${tdClass} text-right font-mono font-bold text-slate-800 dark:text-slate-200`}>{item.quantity}</td>
+                    <td className={`${tdClass} text-right font-mono text-slate-600 dark:text-slate-300`}>{formatRupiah(item.unitPrice)}</td>
+                    <td className={`${tdClass} text-right font-mono font-bold text-emerald-800 dark:text-emerald-400`}>{formatRupiah(item.subtotal)}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-          <div className="flex items-center justify-between border-t border-slate-200 bg-slate-50 px-5 py-4">
-            <span className="text-sm font-medium text-slate-600">Total</span>
-            <span className="text-xl font-semibold text-slate-900">{formatRupiah(sale.total)}</span>
+          <div className="flex items-center justify-between border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 px-5 py-4">
+            <span className="text-sm font-medium text-slate-600 dark:text-slate-300">Total Transaksi</span>
+            <span className="text-xl font-semibold text-slate-900 dark:text-white font-mono">{formatRupiah(sale.total)}</span>
           </div>
         </div>
       )}

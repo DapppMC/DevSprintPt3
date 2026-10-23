@@ -61,7 +61,7 @@ export function StaffFormModal({ onClose, onSuccess }: StaffFormModalProps) {
         </div>
 
         {error && (
-          <div className="rounded-md bg-red-50 p-3 text-sm text-red-700">
+          <div className="rounded-md bg-red-50 dark:bg-red-950/40 p-3 text-sm text-red-700 dark:text-red-300 border border-red-200 dark:border-red-900/50">
             {error}
           </div>
         )}

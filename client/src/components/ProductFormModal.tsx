@@ -183,14 +183,14 @@ export function ProductFormModal({ product, onClose, onSaved }: ProductFormModal
         </div>
 
         {isEdit && (
-          <p className="text-xs text-amber-700 bg-amber-50 p-2.5 rounded-md">
+          <p className="text-xs text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/50 p-2.5 rounded-md">
             Hati-hati: mengubah satuan atau rasio isi dapat mempengaruhi perhitungan stok dan riwayat masa lalu.
           </p>
         )}
 
         {isEdit ? (
-          <p className="rounded-md bg-slate-50 p-3 text-sm text-slate-600">
-            Stok saat ini: <strong>{product.stock} {product.baseUnit}</strong>. Stok diubah lewat penjualan, penerimaan barang, atau
+          <p className="rounded-md bg-slate-50 dark:bg-slate-800/60 p-3 text-sm text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+            Stok saat ini: <strong className="text-slate-900 dark:text-white">{product.stock} {product.baseUnit}</strong>. Stok diubah lewat penjualan, penerimaan barang, atau
             penyesuaian stok.
           </p>
         ) : (
@@ -227,7 +227,7 @@ export function ProductFormModal({ product, onClose, onSaved }: ProductFormModal
         </div>
 
         {error && (
-          <p role="alert" className="rounded-md bg-red-50 p-3 text-sm text-red-700">
+          <p role="alert" className="rounded-md bg-red-50 dark:bg-red-950/40 p-3 text-sm text-red-700 dark:text-red-300 border border-red-200 dark:border-red-900/50">
             {error}
           </p>
         )}

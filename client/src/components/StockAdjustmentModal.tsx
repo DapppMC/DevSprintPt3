@@ -42,15 +42,15 @@ export function StockAdjustmentModal({ product, onClose, onSaved }: StockAdjustm
 
   return (
     <Modal title="Penyesuaian Stok" onClose={onClose}>
-      <p className="mb-4 text-sm text-slate-600">
-        {product.name} <span className="text-slate-400">({product.sku})</span>. Stok saat ini:{' '}
-        <strong>{product.stock}</strong>
+      <p className="mb-4 text-sm text-slate-600 dark:text-slate-300">
+        {product.name} <span className="text-slate-400 dark:text-slate-500">({product.sku})</span>. Stok saat ini:{' '}
+        <strong className="text-slate-900 dark:text-white">{product.stock}</strong>
       </p>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <fieldset>
           <legend className={labelClass}>Jenis</legend>
-          <div className="flex gap-4 text-sm">
+          <div className="flex gap-4 text-sm text-slate-700 dark:text-slate-200">
             <label className="flex items-center gap-2">
               <input
                 type="radio"
@@ -127,7 +127,7 @@ export function StockAdjustmentModal({ product, onClose, onSaved }: StockAdjustm
         </div>
 
         {error && (
-          <p role="alert" className="rounded-md bg-red-50 p-3 text-sm text-red-700">
+          <p role="alert" className="rounded-md bg-red-50 dark:bg-red-950/40 p-3 text-sm text-red-700 dark:text-red-300 border border-red-200 dark:border-red-900/50">
             {error}
           </p>
         )}

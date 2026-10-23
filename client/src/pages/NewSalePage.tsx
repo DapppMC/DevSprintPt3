@@ -163,8 +163,8 @@ export function NewSalePage() {
           </section>
 
           <section className={`${cardClass} overflow-hidden`}>
-            <div className="border-b border-slate-200 px-5 py-4">
-              <h2 className="font-semibold text-slate-900">Daftar Item</h2>
+            <div className="border-b border-slate-200 dark:border-slate-800 px-5 py-4">
+              <h2 className="font-semibold text-slate-900 dark:text-slate-100">Daftar Item</h2>
             </div>
 
             {rows.length === 0 ? (
@@ -174,7 +174,7 @@ export function NewSalePage() {
               />
             ) : (
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-slate-200">
+                <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-800">
                   <thead className={tableHeadClass}>
                     <tr>
                       <th className={thClass}>Produk</th>
@@ -185,12 +185,12 @@ export function NewSalePage() {
                       <th className={thClass} />
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 bg-white dark:bg-slate-900/60">
                     {rows.map(({ line, product, subtotal }) => (
-                      <tr key={line.productId}>
-                        <td className={`${tdClass} font-medium text-slate-900`}>{product.name}</td>
-                        <td className={`${tdClass} text-right`}>{formatRupiah(product.sellingPrice)}</td>
-                        <td className={`${tdClass} text-right`}>{formatNumber(product.stock)}</td>
+                      <tr key={line.productId} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50">
+                        <td className={`${tdClass} font-medium text-slate-900 dark:text-slate-100`}>{product.name}</td>
+                        <td className={`${tdClass} text-right font-mono`}>{formatRupiah(product.sellingPrice)}</td>
+                        <td className={`${tdClass} text-right font-mono`}>{formatNumber(product.stock)}</td>
                         <td className={`${tdClass} text-right`}>
                           <input
                             type="number"
@@ -205,7 +205,7 @@ export function NewSalePage() {
                             }
                           />
                         </td>
-                        <td className={`${tdClass} text-right`}>{formatRupiah(subtotal)}</td>
+                        <td className={`${tdClass} text-right font-mono font-bold text-slate-800 dark:text-slate-200`}>{formatRupiah(subtotal)}</td>
                         <td className={`${tdClass} text-right`}>
                           <button
                             type="button"
@@ -222,10 +222,10 @@ export function NewSalePage() {
               </div>
             )}
 
-            <div className="flex flex-wrap items-center justify-between gap-4 border-t border-slate-200 bg-slate-50 px-5 py-4">
+            <div className="flex flex-wrap items-center justify-between gap-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 px-5 py-4">
               <div>
-                <p className="text-xs uppercase tracking-wide text-slate-500">Total</p>
-                <p className="text-2xl font-semibold text-slate-900">{formatRupiah(total)}</p>
+                <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">Total</p>
+                <p className="text-2xl font-semibold text-slate-900 dark:text-white">{formatRupiah(total)}</p>
               </div>
               <button
                 type="button"

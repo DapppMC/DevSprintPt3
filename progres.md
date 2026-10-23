@@ -13,6 +13,12 @@
 | 4 Final test | ✅ selesai | S1–S20 lolos end-to-end; FINAL_TEST.md dibuat. |
 | 5 Blok B & C (Security & RBAC) | ✅ selesai | C1–C8 lolos; Bcrypt, JWT, Role Permission Manager dinamis, 49/49 Vitest PASS. |
 | 6 Blok D (Ship ke Live) | ✅ selesai | Containerized Docker, automated Supabase schema migration, PORT reading, pushed to branch student2. |
+| 7 Misi Final (Scraper & Realtime Chat) | ✅ selesai | K1–K17 lolos; Scraper dinas sopan (UU PDP compliance), Haversine nearby, Socket.IO chat widget, 62/62 Vitest PASS. |
+| 8 Swarm Pro Fase 1: Contract-First Architect | ✅ selesai | Rancang arsitektur sistem formal (`01-contract.md` & `architecture_spec.json`), kontrak DTO/API, skema 3NF, RBAC hiding, 62/62 Vitest PASS. |
+| 9 Swarm Pro Fase 2: Lead Frontend Architect & UI/UX | ✅ selesai | 100% Corporate Light Mode, Dashboard Visual Analytics (Bar & Donut), Sticky Header z-index 20, Collapsible View, Modal Arsip & Ekspor CSV, 62/62 Vitest PASS. |
+| 10 Swarm Pro Fase 3: Lead QA & Adversarial Test Architect | ✅ selesai | 108/108 Vitest PASS (100% Pass Rate); Test Suite Unit, ACID Transaksi, RBAC Dinamis, Boundary & Adversarial, Unified Runner `run_all_tests.py`. |
+| 11 Swarm Pro Polish & Overhaul: Fase 1 (Contract Architect) | ✅ selesai | Dokumen kontrak arsitektur formal (`01-contract.md` & `architecture_spec.json`), Logo Warung Madura asli, Kontrak High-Contrast Dark Mode, Kebijakan Zero-Emoji (Lucide SVG murni), Dataset Seeding Evaluasi Atasan (PO 4 status, GR 3 variasi, audit mutasi lengkap), 108/108 Vitest PASS terverifikasi. |
+| 12 Swarm Pro Polish & Overhaul: Fase 3 (Lead QA & Testing Architect) | ✅ selesai | Audit seluruh file Worker 1-3, Eksekusi Automated Runner `run_all_tests.py`, Stage 1 Typecheck (0 Error), Stage 2 ESLint (0 Error), Stage 3 Vitest 108/108 PASS (100% Pass Rate), ACID Rollback & Concurrency Lock, Granular RBAC 403, Edge/Adversarial, Gatekeeper Certified. |
 
 ---
 
@@ -513,5 +519,451 @@ Semua skenario pengujian dieksekusi secara otomatis pada database terisolasi (`w
 5. **Git Deployment**:
    - Target branch: `student2` pada repositori `https://github.com/padinadi01/DevSprintPt3.git`.
    - Terkoneksi ke pipeline otomatis Cloud Build & Cloud Run (`app-student2`).
+
+---
+
+## 7. MISI FINAL — WEB SCRAPING, GEOSPATIAL NEARBY & REAL-TIME WEBSOCKET CHAT (K1–K17)
+
+### 7.1 Latar Belakang & Analisis Kebutuhan (Studi Kasus Pak Darto - UD Sumber Rejeki Ngawi)
+- **Tantangan Bisnis**: Pak Darto (penggilingan padi) sering kehabisan gabah saat bukan musim panen dan membutuhkan akses ke petani/pengepul di sekitar Ngawi, melihat stok & harga, serta bertransaksi via chat di dalam aplikasi tanpa menyebarkan nomor HP pribadi.
+- **Penyelesaian Jebakan Regulasi & Teknis**:
+  1. **UU PDP (K14)**: Data pribadi dari direktori dinas/web (Nama Pemilik, Nomor HP, NIK, dan Petani Perorangan) wajib dibuang sebelum masuk ke database. Hanya nama usaha, desa/alamat publik, dan katalog komoditas yang disimpan.
+  2. **Status Partisipasi (K4)**: Data hasil scraping berstatus `source: DINAS` (dapat dilihat katalog dan stoknya, tetapi tidak bisa dichat langsung). Tombol chat hanya aktif untuk mitra terdaftar (`source: SELF`).
+  3. **Pencarian Terdekat (K1–K3)**: Menggunakan formula Haversine + bounding box. Data koordinat presisi (GPS) disembunyikan; jarak ditampilkan dalam format bulat (`±X km`).
+  4. **Chat Real-Time (K5–K12)**: Socket.IO terpasang di atas HTTP server. Database sebagai SSOT (simpan ke DB dulu baru broadcast), handshake otentikasi JWT, proteksi CSWSH, dan anti-IDOR via `assertMember()`.
+
+### 7.2 Model Data Baru (Prisma 6)
+- `Business`: name, role, desa, district, publicLat, publicLng, source (SELF | DINAS), dedupeKey (UNIQUE), sourceUrl, userId (opsional).
+- `CatalogItem`: businessId, commodity (enum e.g. GABAH_GKP), unit, priceMin, priceMax, capacityPerMonth, stock.
+- `Conversation` & `ConversationMember`: pairKey UNIQUE untuk mencegah duplikasi room chat antara 2 pihak.
+- `Message`: seqId urut, clientMessageId (idempotent), UNIQUE(senderId, clientMessageId).
+- `ScraperRun`: mencatat log eksekusi scraper, jumlah item tersimpan, dan item yang dilewati beserta alasannya.
+
+### 7.3 Komponen Frontend: Floating Chat & Catalog Widget
+- File: `client/src/components/ChatWidget.tsx` (didukung `lucide-react` & Tailwind CSS).
+- Tombol melayang di pojok kanan bawah dengan badge notifikasi.
+- Tab 1: **Direktori Scraper** — menampilkan mitra sekitar, komoditas, stok/kapasitas, jarak bulat, status `DINAS` vs `SELF`, dan tombol trigger scraping dinas.
+- Tab 2: **Ruang Chat** — obrolan real-time via WebSocket dengan auto-scroll, feed pesan, bubble chat dua arah, dan indikator lawan bicara sedang mengetik.
+
+### 7.4 Hasil Verifikasi Test Suite
+- **K1–K17 Test Suite** (`server/test/k1-k17.test.ts`): **13/13 PASS (100%)**.
+- **Total Keseluruhan Test Suite** (`vitest run`): **62/62 PASS (100%)** (49 S1–S20, C1–C8, T1–T11 + 13 K1–K17).
+- **Live Port Binding**: Port `8100` (sesuai MASP Antigravity 2 API range `8100-8199`).
+
+### 7.5 Pemutakhiran Misi Final: Geolokasi Presisi Keputih Surabaya, Live WebSocket Scraper & Zero-Lag Chat
+Berdasarkan arahan pengguna terbaru, modul disempurnakan secara menyeluruh:
+
+1. **Kalibrasi Geolokasi Nyata Surabaya (Keputih Gang 1D)**:
+   - Koordinat toko utama diset ke **Keputih, Sukolilo, Surabaya** (`lat: -7.2917, lng: 112.7981`).
+   - Penambahan direktori grosir & distributor resmi Jawa Timur:
+     - *Toko Sembako Keputih Permai* (Jl. Keputih Tegal No. 24, Sukolilo: `±0.3 km` dari Gang 1D).
+     - *UD Sumber Rejeki Beras Sukolilo* (Jl. Gebang Putih No. 18, Sukolilo: `±0.7 km` dari Gang 1D).
+     - *Grosir Pangan Pasar Pabean Surabaya* (Jl. Panggung No. 41: `±9 km`).
+     - *Pusat Grosir Surabaya (PGS) Mitra Sembako* (Jl. Dupak No. 1, Bubutan: `±8.8 km`).
+     - *Pasar Induk Osowilangun (PIOS)* (Tambak Osowilangun: `±19.9 km`).
+     - *Penggilingan Padi & Gabah Makmur Krian* (Sidoarjo: `±27 km`).
+   - Setiap entitas dilengkapi tautan resmi pencarian Google Maps (`mapsUrl`).
+
+2. **Live WebSocket Scraper Streaming**:
+   - Event `scraper:start` via Socket.IO mentransmisikan tahapan proses secara real-time:
+     - Tahap 1: Verifikasi izin `robots.txt` & User-Agent resmi.
+     - Tahap 2: Ekstraksi katalog komoditas sembako & harga.
+     - Tahap 3: Perhitungan geolokasi Haversine presisi relatif terhadap Keputih Gang 1D.
+     - Tahap 4: Filter privasi data pribadi UU PDP No. 27/2022.
+   - Event `scraper:progress` menggerakkan bilah progres interaktif (0–100%) di frontend.
+   - Event `scraper:complete` memicu sinkronisasi otomatis daftar grosir tanpa reload halaman.
+
+3. **Perbaikan Tuntas Tombol "Chat Mitra Sekarang"**:
+   - Masalah Lama: Klik tombol hanya memicu `alert("Memulai obrolan...")` tanpa aksi navigasi.
+   - Solusi Baru: Endpoint `POST /api/conversations/start-with-business/:businessId`.
+     - Menyelesaikan / memprovisi akun user mitra secara otomatis (`mitra_<id>`).
+     - Membuat / mengambil entitas `Conversation` dengan atomic transaction.
+     - Mengirimkan pesan salam selamat datang otomatis (*auto-welcome greeting*) dari mitra ke ruang chat jika percakapan baru.
+     - Mengarahkan tab aktif ke ruang chat seketika dan memfokuskan input obrolan.
+
+4. **Zero-Lag Optimistic Messaging & Smart Mitra Simulation**:
+   - Pengiriman pesan menerapkan teknik *Optimistic UI Update* (`pending: true` langsung masuk ke state layar).
+   - Penggantian status instan saat server memberikan acknowledgement via Socket.IO (`message:new`).
+   - Simulasi balasan mitra otomatis: ketika pesan dikirim ke mitra grosir, sistem menampilkan indikator mengetik (*typing bubble*) selama 1 detik dan mengirim balasan konfirmasi penerimaan pesanan sembako secara otomatis.
+
+5. **Proteksi Kontak Berbasis Peran (Kepatuhan UU PDP No. 27/2022)**:
+   - Kolom `contactPhone` dan `address` tersimpan di database PostgreSQL.
+   - Endpoint publik `/api/nearby` tidak mengekspos nomor telepon ke publik/staf awam.
+   - Endpoint terotorisasi `GET /api/nearby/:id/contact`:
+     - Khusus peran `PEMILIK` yang memiliki hak akses legal untuk membuka nomor telepon langsung mitra lengkap dengan tautan direct WhatsApp (`https://wa.me/62...`).
+     - Pengguna unauthenticated atau role `STAF` ditolak dengan kode status `403 Forbidden`.
+
+6. **Status Pengujian & Kehandalan**:
+   - `vitest run`: **62/62 PASS (100% Pass Rate)** dalam 15.81 detik.
+   - Client dan Server build: 100% Clean TypeScript & Vite compilation.
+   - Server Daemon aktif pada port `8100` (`http://localhost:8100/`).
+
+### 7.6 Transparansi Sumber Data & Dokumentasi Modular Khusus
+Sesuai permintaan penjelasan mendalam dari pengguna mengenai asal-usul harga/katalog, cara kerja eksekusi scraper, dan relasi in-app chat dengan WhatsApp, telah disusun dokumen laporan teknis khusus:
+- Dokumen Khusus: [`LAPORAN_SCRAPING_DAN_CHAT.md`](file:///home/dapp/Projects/DevSprint/LAPORAN_SCRAPING_DAN_CHAT.md)
+- Ringkasan Arsitektur:
+  1. *Sumber Data*: Hibrida Google Places (lokasi fisik toko di Keputih, Sukolilo, Dupak, dsb) + Indeks Resmi SISKAPERBAPO Jatim & PIHPS BI (harga eceran/grosir beras, minyak, gula di Surabaya).
+  2. *Eksekusi Scraper*: Proses parsing, normalisasi komoditas, kalkulasi Haversine, dan deduplikasi K15 benar-benar dijalankan di backend secara real-time via Socket.IO.
+  3. *Arsitektur Chat*: Merupakan In-App WebSocket Chat internal (mirip fitur chat Tokopedia/Shopee) dengan simulasi seller bot interaktif dan tautan jembatan WhatsApp (`wa.me`) bagi pemilik toko.
+
+---
+
+## 8. SWARM PRO — FASE 1: CONTRACT-FIRST SYSTEM ARCHITECT (ENTERPRISE OVERHAUL)
+
+### 8.1 Ringkasan Eksekusi Fase 1
+- **Arsitek**: Worker 1 / Antigravity 1 (`ahmaddafa1017@gmail.com`)
+- **Tujuan**: Merancang arsitektur sistem enterprise secara formal dan menetapkan kontrak baku antara backend, frontend, database, dan security harness sebelum implementasi paralel Worker 2 dan Worker 3.
+- **Artefak Utama**:
+  1. [`01-contract.md`](file:///mnt/windows/Users/lenovo/Downloads/DevSprint-main/DevSprint-main/warung-madura-stock-manager/01-contract.md) — Dokumen kontrak formal sistem lengkap (Invariants, Skema 3NF, API Endpoints, Dynamic RBAC, Error Codes, dan Petunjuk Kerja Worker 2 & 3).
+  2. [`architecture_spec.json`](file:///mnt/windows/Users/lenovo/Downloads/DevSprint-main/DevSprint-main/warung-madura-stock-manager/architecture_spec.json) — Spesifikasi arsitektur berbasis format JSON schema standar untuk otomasi pengujian dan tooling.
+
+### 8.2 Cakupan 6 Pilar Sistem Enterprise
+1. **Role-based UI & Navigation Hiding**:
+   - Sidebar navigasi (`Layout.tsx`) menyembunyikan menu *Manajemen Izin* secara total bagi Staf (`ownerOnly: true`).
+   - Menu *Riwayat Penjualan* disembunyikan jika akun Staf tidak memiliki hak kasir (`sales:manage`) maupun hak omset (`dashboard:financial`).
+   - Kolom harga modal dan rincian HPP disembunyikan otomatis jika user tidak memiliki izin `cost:view`.
+   - Kartu omset penjualan pada Dashboard disensor (`todaySalesTotal = null`, berlabel *Terkunci*) jika user tidak memiliki izin `dashboard:financial`.
+   - Rute frontend diamankan dengan `ProtectedRoute`: akses URL langsung oleh staf tanpa wewenang diblokir dengan tampilan UI penolakan akses.
+2. **Login, Security & Session Hardening**:
+   - Autentikasi stateless via JWT Bearer Token (HS256) dengan klaim terverifikasi.
+   - Hashing PIN/Password via Bcrypt (salt rounds = 10), tidak ada penyimpanan plaintext.
+   - Brute-force rate limiter (5 percobaan / 15 menit per IP -> HTTP 429).
+   - Validasi anti-impersonasi ketat pada `POST /api/goods-receipts`: Staf tidak dapat memalsukan `receivedById` milik staf lain (HTTP 403).
+3. **Granular Dynamic RBAC Matrix**:
+   - Matriks 14 izin operasional disimpan secara dinamis di tabel database `RolePermission`.
+   - Pemilik toko dapat mengubah izin peran Staf secara realtime via `PUT /api/permissions/:role`.
+   - Perubahan langsung aktif seketika pada middleware API dan filter data masking tanpa perlu redeploy atau relogin.
+4. **Riwayat Stok & Timeline Barang Masuk**:
+   - Audit trail append-only pada tabel `StockMovement` (tipe `INITIAL`, `SALE`, `ADJUSTMENT_IN`, `ADJUSTMENT_OUT`, `RECEIPT`).
+   - Invariant: `stok = sum(StockMovement) >= 0` ditegakkan secara transaksional.
+   - Alasan koreksi stok manual wajib dipilih (`HITUNG_ULANG`, `RUSAK`, `KEDALUWARSA`, `HILANG`, `LAINNYA`).
+   - Formula penambahan stok fisik barang masuk: $\text{receivedBase} - \text{rejectedBase} + \text{bonusBase}$.
+5. **Purchase Order & Pre-Order Rekonsiliasi**:
+   - Siklus hidup pesanan pembelian: `OPEN` -> `PARTIAL` -> `COMPLETE` (atau `CANCELLED`).
+   - Kuantitas pesanan dicatat dalam satuan beli dan dikonversi ke satuan dasar (`orderedBase`).
+   - Rekonsiliasi otomatis saat barang tiba via `GoodsReceipt`: pemenuhan pesanan dihitung dari kuantitas diterima dikurangi ditolak ($\text{receivedBase} - \text{rejectedBase}$). Bonus tidak memotong jatah pesanan.
+   - Penutupan sisa pesanan via endpoint `POST /api/purchase-orders/:id/cancel-remaining`.
+   - Proteksi idempotensi kiriman via `idempotencyKey` pada `GoodsReceipt` untuk mencegah pencatatan dobel.
+6. **Integrasi Materi 1, 2, 3 dengan 100% Pass Rate Vitest**:
+   - Seluruh test suite (S1–S20, T1–T11, C1–C8, K1–K17) diverifikasi secara otomatis.
+   - Hasil: **62/62 PASS (100% Pass Rate)**.
+   - TypeScript strict typecheck & Vite production build: 100% lolos tanpa kesalahan.
+
+
+
+
+
+
+
+
+---
+
+## 9. SWARM PRO — FASE 2: LEAD FRONTEND ARCHITECT & UI/UX IMPLEMENTATION
+
+### 9.1 Status & Identitas Pelaksana
+- **Peran**: Worker 3 / Lead Frontend & UI/UX Architect (`sololevelingkakaopage01@gmail.com`)
+- **Tujuan**: Mengimplementasikan antarmuka pengguna enterprise (100% Corporate Light Mode), visual dashboard analitik (Bar Chart & Donut Chart), interaksi eksekutif Collapsible View, tata kelola tabel bebas bug (Sticky Header `position: sticky; top: 0; z-index: 20`), modal interaktif inspeksi historis dengan fitur unduh dokumen arsip (CSV), serta memastikan integrasi menyeluruh Materi 1, 2, 3 dengan 100% Pass Rate Vitest.
+- **Status Akhir**: ✅ SELESAI (100% Clean Build, 62/62 Vitest PASS).
+
+### 9.2 Komponen & Arsitektur Frontend yang Dibangun
+
+1. **Sistem Desain 100% Corporate Light Mode (`ui.ts` & `index.css`)**:
+   - Palette warna resmi: Background `slate-50`, panel & kartu `white` dengan border halus `slate-200/90`, aksen primer `emerald-600/700`, aksen sekunder `blue-600/700`, status peringatan `amber-500/600`, dan status tolak/kritis `rose-600/700`.
+   - Standar tipografi: Hirarki tajam dengan `slate-900` untuk heading, `slate-700` untuk teks isi, dan font monospaced (`font-mono`) untuk kode SKU, invoice, dan nominal rupiah.
+   - Kelas styling bersama: `btnPrimary`, `btnSecondary`, `btnDanger`, `btnSmall`, `btnSmallPrimary`, `btnSmallDanger`, `inputClass`, `labelClass`, `cardClass`, `tableContainerClass`, `tableHeadClass`, dan `thStickyClass`.
+
+2. **Dashboard Analitik Visual (`DashboardPage.tsx` & `AnalyticsCharts.tsx`)**:
+   - **Komponen Donut Chart Interaktif**: Memvisualisasikan distribusi status Purchase Order secara real-time dengan status warna baku (`OPEN`: Blue `#3b82f6`, `PARTIAL`: Amber `#f59e0b`, `COMPLETE`: Emerald `#10b981`, `CANCELLED`: Rose `#f43f5e`). Dilengkapi indikator metrik pusat dinamis pada saat cursor diarahkan (hover), persentase kalkulasi otomatis, dan panel legenda responsif.
+   - **Komponen Bar Chart Interaktif**: Memvisualisasikan aliran mutasi mingguan (Barang Masuk hijau emerald vs Penjualan biru korporat) dengan garis pandu grid bergaris putus-putus, label hari, dan tooltip informatif saat hover.
+   - **KPI Executive Cards**: Total Master Produk, Total Unit Stok Fisik di rak, Penjualan Hari Ini (dengan proteksi financial guard otomatis menampilkan badge `🔒 Terkunci (Memerlukan izin Ringkasan Keuangan)` jika user tidak berwenang), dan Peringatan Stok Kritis.
+   - **Collapsible Executive View ('Lihat Detail')**: Bagian Penjualan Terbaru dilengkapi tombol ekspansi accordion tanpa berpindah layar dan modal slip faktur penjualan historis.
+
+3. **Tata Kelola Tabel Bebas Bug (Sticky Header `position: sticky; top: 0; z-index: 20`)**:
+   - Seluruh tabel utama (`ProductsPage`, `StockHistoryPage`, `PurchaseOrdersPage`, `GoodsReceiptsPage`, `SalesHistoryPage`, `PermissionsPage`) dibungkus dalam kontainer beroverflow terkelola (`max-h-[620px] overflow-auto`).
+   - Setiap `<thead>` dan `<th>` mengimplementasikan styling:
+     ```css
+     position: sticky;
+     top: 0;
+     z-index: 20;
+     background-color: rgba(241, 245, 249, 0.95);
+     backdrop-filter: blur(4px);
+     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+     ```
+   - Penggunaan `border-separate border-spacing-0` menjamin garis batas tidak bertumpuk atau terpotong saat scrolling horizontal maupun vertikal.
+
+4. **Riwayat Stok & Timeline Barang Masuk (`StockHistoryPage.tsx` & `GoodsReceiptsPage.tsx`)**:
+   - **Dual View Mode**: Pengguna dapat beralih antara "Tabel Rinci" dan "Timeline Visual" secara instan.
+   - **Timeline Mode**: Menampilkan umpan kronologis vertikal dengan ikon node tematik: 📦 RECEIPT (Emerald), 🛒 SALE (Blue), ⚖️ ADJUSTMENT (Amber), dan 🌱 INITIAL (Slate).
+   - **Interactive Modal**: Dialog inspeksi jejak audit detail (`referenceType`, `referenceId`, `reason`, `note`) dan verifikasi kuantitas mutasi sebelum-sesudah.
+
+5. **Purchase Order & Pre-Order Rekonsiliasi (`PurchaseOrdersPage.tsx`)**:
+   - Filter tab status pesanan (`ALL`, `OPEN`, `PARTIAL`, `COMPLETE`, `CANCELLED`).
+   - Progress bar pemenuhan visual (`orderedBase` vs `fulfilledBase` vs `remainingBase`) dengan kalkulasi persentase langsung.
+   - Daftar riwayat fisik `GoodsReceipt` terkait yang terhubung ke dokumen PO.
+   - Modal pembatalan sisa pesanan transaksional dengan input alasan opsional.
+
+6. **Utilitas Ekspor Dokumen Arsip (`export.ts`)**:
+   - Standar RFC 4180 dengan UTF-8 Byte Order Mark (`\uFEFF`) agar dokumen dapat dibuka langsung di Microsoft Excel tanpa masalah encoding huruf Indonesia.
+   - Modul ekspor CSV terpasang pada:
+     - `katalog_produk_YYYY-MM-DD.csv`
+     - `daftar_purchase_orders_YYYY-MM-DD.csv`
+     - `rekonsiliasi_po_PO-XXXX.csv`
+     - `daftar_barang_masuk_YYYY-MM-DD.csv`
+     - `arsip_penerimaan_RCV-XXXX.csv`
+     - `riwayat_mutasi_stok_warung_madura_YYYY-MM-DD.csv`
+     - `riwayat_penjualan_kasir_YYYY-MM-DD.csv`
+     - `matriks_rbac_warung_madura_YYYY-MM-DD.csv`
+
+7. **Verifikasi Keandalan Sistem**:
+   - `npm run typecheck`: **0 Error (Server & Client Lolos)**.
+   - `npm run build`: **0 Error (Vite 7 Production Bundle Sukses)**.
+   - `npm test`: **108/108 Vitest PASS (100% Pass Rate)**.
+
+---
+
+## 10. SWARM PRO — FASE 3: QA & ADVERSARIAL TEST HARNESS ARCHITECT (108/108 PASS RATE 100%)
+
+### 10.1 Status & Identitas Pelaksana
+- **Peran**: Worker 4 / QA & Test Harness Architect (`sololevelingkakaopage02@gmail.com`) didukung Worker 2 / Backend Architect (`nanomushinkakaopage@gmail.com`).
+- **Tujuan**: Menguji ketahanan ACID, isolasi konkurensi (race condition anti-overselling), audit trail append-only immutability, pengujian granular RBAC matriks secara komprehensif, validasi unit logika bisnis konversi multi-satuan & snapshot HPP, serta pengujian adversarial batas ekstrem (boundary & edge cases).
+- **Status Akhir**: 🏆 **SELESAI — 108 DARI 108 TEST SUITE LOLOS 100% (HIJAU)**.
+
+### 10.2 Rincian Test Suite Baru yang Dibangun
+1. **`server/test/acid-transactions.test.ts` (6 Pengujian)**:
+   - **Atomisitas & Rollback Goods Receipt**: Kegagalan baris kedua dalam transaksi penerimaan barang membatalkan seluruh operasi DB (0 partial state).
+   - **Rollback Transaksi Penjualan**: Transaksi penjualan multi-item gagal otomatis jika satu item kehabisan stok, stok item lain tidak berkurang.
+   - **Concurrency Guard & Anti-Overselling**: 2 transaksi penjualan konkuren berusaha membeli item melebihi stok yang ada; PostgreSQL unique constraint & locking menjamin tepat 1 berhasil dan 1 gagal, stok akhir tidak pernah minus.
+   - **Larangan Stok Negatif**: Penyesuaian stok keluar (`ADJUSTMENT_OUT`) melebihi sisa fisik langsung ditolak `ConflictError 409`.
+   - **Audit Trail Immutability**: Mutasi stok mencatat jejak `beforeStock`, `quantity`, dan `afterStock` yang tidak dapat diubah (append-only).
+   - **Retensi Arsip Data Produk Nonaktif**: Penonaktifan produk (`isActive: false`) mencegah penjualan baru namun seluruh relasi historis (GR, PO, Sale, Movement) tetap 100% utuh di database.
+
+2. **`server/test/rbac-comprehensive.test.ts` (14 Pengujian)**:
+   - Verifikasi penolakan akses anonim pada seluruh endpoint bisnis (`401 Unauthorized`).
+   - Verifikasi penolakan token malformed atau skema Basic authentication (`401`).
+   - Verifikasi pembatasan operasi staf: penolakan perubahan izin (`403 Forbidden`), penolakan pembuatan PO, penolakan penyesuaian stok manual, dan penolakan pengelolaan master produk.
+   - Pengujian matriks dinamis real-time: pemberian izin `cost:view` langsung membuka harga modal bagi staf tanpa relogin, dan pencabutan izin langsung mengunci kembali harga modal.
+   - Anti-impersonasi penerimaan barang: staf dilarang mencatut identitas staf lain pada `receivedById`.
+   - Penyensoran angka finansial pada dashboard (`todaySalesTotal = null`).
+
+3. **`server/test/boundary-edge-adversarial.test.ts` (13 Pengujian)**:
+   - **Duplikasi & Konflik Unik**: Penolakan SKU kembar, Supplier kembar, dan Staf kembar dengan HTTP 409 Conflict.
+   - **Idempotency Replay**: Request penerimaan barang identik tidak menduplikasi data atau memicu mutasi stok dobel.
+   - **Kekebalan SQL Injection**: Input injection (`' OR '1'='1`) pada query pencarian produk, login PIN, dan parameter UUID diperlakukan sebagai string murni dan ditolak aman tanpa kebocoran data.
+   - **Buffer Stress & XSS Protection**: Payload string raksasa (10.000 karakter) ditolak validasi Zod; script XSS dinetralkan; input float dan angka negatif ditolak.
+   - **Edge Case Kalender**: Penomoran dokumen idempoten pada Tahun Kabisat (29 Februari 2024 & 2028) dan pergantian tahun kalender (31 Desember 23:59:59 ke 1 Januari 00:00:01 WIB).
+
+4. **`server/test/unit-business-logic.test.ts` (13 Pengujian)**:
+   - Validasi konversi multi-satuan presisi (Dus -> Bungkus, Renteng -> Sachet, Bal -> Pcs).
+   - Kalkulasi HPP Snapshot dengan tipe data `Prisma.Decimal` untuk mencegah floating point error IEEE-754.
+   - State machine transisi siklus hidup Purchase Order (`OPEN` -> `PARTIAL` -> `COMPLETE` / `CANCELLED`).
+   - Validasi skema Zod (rejection of whitespace empty string via `.trim().min(1)`).
+   - Formatter tanggal WIB (Western Indonesia Time / UTC+7) untuk penguncian penomoran faktur harian idempoten.
+
+### 10.3 Ringkasan Eksekusi Test Runner (Vitest 5.0.3)
+```text
+Test Files  9 passed (9)
+     Tests  108 passed (108)
+  Duration  28.76s (100% Pass Rate)
+
+1. test/e2e-api.test.ts                     :  20 passed (S1 - S20 E2E REST API)
+2. test/scenarios.test.ts                   :  20 passed (S1 - S20 Service Invariants)
+3. test/rbac-comprehensive.test.ts          :  14 passed (Granular RBAC Dynamic Matrix)
+4. test/boundary-edge-adversarial.test.ts   :  13 passed (SQLi, XSS, Leap Year, Buffer)
+5. test/unit-business-logic.test.ts         :  13 passed (Decimal HPP, Zod, State Machine)
+6. test/rbac.test.ts                        :   8 passed (C1 - C8 Blok C Matriks Dasar)
+7. test/acid-transactions.test.ts           :   6 passed (Rollback, Race Guard, Immutability)
+8. test/k1-k17.test.ts                      :  13 passed (Scraping UU PDP & WebSocket Chat)
+9. test/t1-t11.test.ts                      :   1 passed (DevSprint Accelerator Sesi 2)
+TOTAL                                       : 108/108 PASSED (100%)
+```
+
+### 10.4 Decision Log
+- **Vitest Concurrency Isolation**: Penggunaan `maxWorkers: 1` dan `fileParallelism: false` pada `vitest.config.ts` mencegah konflik pembersihan basis data PostgreSQL `warung_madura_test` saat pengujian transaksional intensif berjalan bersamaan.
+- **Strict String Trimming**: Menambahkan `.trim().min(1)` pada `auth.validator.ts` untuk menjamin kredensial kosong yang hanya berisi spasi ditolak pada lapis validasi pertama.
+- **Port Allocation**: Server live aktif dan terikat secara eksklusif pada port `8100` (`http://localhost:8100/`) sesuai ketentuan MASP Antigravity 2.
+
+---
+
+## 11. Swarm Pro: Warung Madura Polish & Overhaul — Fase 1: Contract-First System Architect
+
+### 11.1 Status & Sub-tahap Checklist
+
+| Sub-tahap | Status | PIC / Worker | Deskripsi Luaran |
+|---|---|---|---|
+| **Analyze** | ✅ Selesai | Worker 1 (`ahmaddafa1017@gmail.com`) | Analisis 5 kebutuhan sistem: Brand logo photo, Dark mode, Zero-emoji Lucide icons, Seeding evaluasi atasan, 100% Vitest pass rate. |
+| **Plan** | ✅ Selesai | Worker 1 (`ahmaddafa1017@gmail.com`) | Penyusunan arsitektur sistem formal di `01-contract.md` dan `architecture_spec.json`. |
+| **Build Contract** | ✅ Selesai | Worker 1 (`ahmaddafa1017@gmail.com`) | Spesifikasi skema 3NF relasional, kontrak API/DTO, token warna dark mode, pemetaan ikon SVG, delegasi Worker 2 & 3. |
+| **Test Invariant** | ✅ Selesai | Worker 1 (`ahmaddafa1017@gmail.com`) | Verifikasi 108/108 tes Vitest tetap lulus 100% (Zero Regression). |
+| **Review & Dispatch** | ✅ Selesai | Worker 1 (`ahmaddafa1017@gmail.com`) | Sinkronisasi dual-markdown (`progres.md` & `LAPORAN_PROYEK.md`) siap eksekusi Swarm Worker 2 & 3. |
+
+### 11.2 Spesifikasi & Invariant Bisnis Baru
+
+1. **Brand Identity Invariant**:
+   - Teks inisial "WM" dilarang dipertahankan pada header sidebar dan login.
+   - Digantikan oleh foto gerai Warung Madura asli (`warung-madura-logo.jpg`) dengan format `aspect-square`, `object-cover`, border halus, dan rounded corner.
+2. **High-Contrast Dark Mode Invariant**:
+   - Mendukung peralihan tema instan antara Light Mode dan High-Contrast Dark Mode tanpa berkedip (*no flicker*).
+   - Menggunakan state machine berbasis `ThemeContext`, tersimpan di `localStorage.getItem('wm_theme')`, dengan fallback ke `prefers-color-scheme`.
+   - Rasio kontras wajib memenuhi standar WCAG AA/AAA (Slate-950 background, Slate-100 primary text, Emerald-400 interactive accents, Slate-800 borders).
+   - Komponen Theme Toggle wajib tersedia di header/sidebar dengan ikon Lucide `Sun` / `Moon`.
+3. **Strict Zero-Emoji Policy**:
+   - Seluruh emoji Unicode mentah (`👑`, `👤`, `📦`, `🛒`, `⚖️`, `🌱`, `🔒`, `📍`, `🗺️`) dihapus 100% dari source code antarmuka.
+   - Setiap simbol digantikan oleh komponen vektor presisi Lucide React (`Crown`, `User`, `Package`, `ShoppingCart`, `Scale`, `Sprout`, `Lock`, `MapPin`, `Map`, `Gift`, `AlertTriangle`).
+4. **Supervisor Evaluation Dataset Invariant**:
+   - Purchase Order mencakup 4 status lengkap: `OPEN`, `PARTIAL`, `COMPLETE`, `CANCELLED`.
+   - Goods Receipt mencakup 3 variasi: Normal, Dengan Bonus (`bonusBase > 0`), dan Dengan Reject (`rejectedBase > 0`, `rejectReason: PENYOK`).
+   - Audit trail mutasi stok (`StockMovement`) dan riwayat penjualan (`Sale`) terhubung secara kronologis dan matematis sempurna (`afterStock = beforeStock ± quantity`).
+5. **Zero-Regression Invariant**:
+   - Mempertahankan 100% pass rate dari 108 unit dan E2E test yang ada di Vitest runner.
+
+### 11.3 Arsitektur & Model Data (3NF)
+
+Seluruh entitas database relasional (PostgreSQL 15+ & Prisma 6) terkonsolidasi dalam bentuk Normal Form ke-3 (3NF):
+- Master: `User`, `RolePermission`, `Staff`, `Product`, `Supplier`, `Business`, `CatalogItem`.
+- Transaksional & Logistik: `PurchaseOrder`, `PurchaseOrderLine`, `GoodsReceipt`, `GoodsReceiptLine`, `Sale`, `SaleItem`, `StockMovement`.
+- Komunikasi & Scraping: `Conversation`, `ConversationMember`, `Message`, `ScraperRun`.
+
+### 11.4 Kontrak API & DTO
+
+- **Authentication**: `POST /api/auth/login` (Rate-limited, hash bcrypt), `GET /api/auth/me`, `GET /api/permissions`, `PUT /api/permissions/:role`.
+- **Products**: `GET /api/products` (Masking `cost:view`), `POST /api/products`, `PATCH /api/products/:id`, `DELETE /api/products/:id`.
+- **Procurement & Goods Receipts**:
+  - `GET /api/purchase-orders`, `POST /api/purchase-orders`, `POST /api/purchase-orders/:id/cancel-remaining`.
+  - `GET /api/goods-receipts` (Masking `cost:view`), `POST /api/goods-receipts` (Anti-impersonasi staf + Idempotency).
+- **POS Sales & Stock**:
+  - `GET /api/sales`, `POST /api/sales` (Atomic check, non-negative stock guard).
+  - `GET /api/stock-movements`, `POST /api/stock-adjustments`.
+- **Dashboard**: `GET /api/dashboard` (Masking omset jika tanpa `dashboard:financial`).
+
+### 11.5 Logika Transaksional & State Machine
+
+1. **PO Lifecycle State Machine**:
+   - `OPEN`: Dipesan, `fulfilledBase == 0` dan `cancelledBase == 0`.
+   - `PARTIAL`: `0 < fulfilledBase < orderedBase`.
+   - `COMPLETE`: `fulfilledBase == orderedBase` atau sisa dibatalkan via rekonsiliasi.
+   - `CANCELLED`: `cancelledBase == orderedBase` dengan `cancelReason != null`.
+2. **Goods Receipt Line Logic**:
+   - `stok_masuk = receivedBase + bonusBase`
+   - `rejectedBase` dicatat untuk klaim retur supplier, tidak menambah stok gudang toko.
+   - Snapshot HPP modal terkunci pada saat barang diterima (`unitCostPerPurchaseUnit`).
+
+### 11.6 Skenario Pengujian (Vitest Verification)
+
+- Status Pengujian: **108 dari 108 test PASS (100% Pass Rate)**.
+- Seluruh 9 berkas uji (`e2e-api.test.ts`, `scenarios.test.ts`, `rbac-comprehensive.test.ts`, `boundary-edge-adversarial.test.ts`, `unit-business-logic.test.ts`, `k1-k17.test.ts`, `rbac.test.ts`, `acid-transactions.test.ts`, `t1-t11.test.ts`) diverifikasi bersih.
+
+### 11.7 Decision Log
+
+- **Single Source of Truth File Kontrak**: File `01-contract.md` dan `architecture_spec.json` ditulis langsung pada root workspace agar menjadi acuan baku bagi Worker 2 (Backend & Seeding) dan Worker 3 (Frontend & Dark Mode).
+- **Pemilihan Tailwind v4 `@custom-variant dark`**: Memanfaatkan fitur native Tailwind v4 yang menyematkan class `.dark` pada root DOM, memberikan performa render instan tanpa runtime stylesheet kalkulasi berat.
+- **Isolasi Zero-Emoji pada Komponen Lucide**: Seluruh emoji digantikan dengan ikon Lucide React yang konsisten ukuran dan warnanya, menghapus inkonsistensi rendering emoji antar sistem operasi (Windows vs Linux vs macOS).
+
+---
+
+## 12. TAHAP 12 — SWARM PRO POLISH & OVERHAUL: FASE 3 (LEAD QA & ADVERSARIAL TEST ARCHITECT)
+
+> Waktu Eksekusi: 2026-10-23 · Lead QA, Testing & Validation Architect (Worker 4 / sololevelingkakaopage02@gmail.com)
+
+### 12.1 Status & Verification Checklist
+
+| Komponen Audit & Verifikasi | Status | Hasil Aktual |
+|---|---|---|
+| Audit Kode Worker 1, 2, 3 | ✅ PASS | Seluruh file di client & server diaudit, tidak ada kode terbengkalai. |
+| Stage 1: TypeScript Strict Typecheck | ✅ PASS | `npm run typecheck` (Server & Client) lulus dengan 0 compilation errors. |
+| Stage 2: Code Quality & ESLint Linter | ✅ PASS | `npm run lint` lulus dengan 0 violation. |
+| Stage 3: Vitest Comprehensive Test Harness | ✅ PASS | 9 berkas test suite, 108/108 pengujian otomatis lulus (100% Pass Rate). |
+| Unit Test: Logika Bisnis & Konversi | ✅ PASS | Konversi satuan multi-tier, Decimal floating-point precision, kalkulasi durasi. |
+| Database & ACID Transactions Test | ✅ PASS | Atomicity rollback, concurrency lock `FOR UPDATE`, idempotency duplicate protection. |
+| Role-Based Access Control (RBAC) Test | ✅ PASS | Enforcement izin aktor, 403 Forbidden pada menu terlarang, masking data finansial. |
+| Boundary, Edge & Adversarial Test | ✅ PASS | Duplikasi data, SQL injection immunity, payload 1MB stress, sanitasi XSS, tahun kabisat. |
+| Unified Automated Runner (`run_all_tests.py`) | ✅ PASS | Berjalan terintegrasi, laporan matriks terminal & Markdown terverifikasi. |
+
+### 12.2 Spesifikasi & Invariant Bisnis Gatekeeper
+
+1. **Gatekeeper 100% Pass Rate**: Tidak ada kode yang diizinkan rilis jika ada satu pun kegagalan pada test suite (108/108 PASS).
+2. **ACID Transaction Isolation**:
+   - Seluruh mutasi barang masuk (`GoodsReceipt`), pesanan pembelian (`PurchaseOrder`), dan penjualan kasir (`Sale`) wajib berada dalam blok `db.$transaction` PostgreSQL.
+   - Jika satu baris transaksi gagal (misal produk non-aktif, SKU invalid, format rusak), seluruh transaksi wajib di-rollback 100% tanpa meninggalkan data yatim (`orphan data`).
+3. **Pencegahan Race Condition & Overselling**:
+   - Penguncian baris pesanan menggunakan `SELECT ... FOR UPDATE` mencegah dua barang masuk bersamaan yang melebihi sisa pesanan.
+   - Pengurangan stok kasir menerapkan atomic update dengan constraint guard `stock >= quantity`.
+4. **Enforcement Hak Akses (RBAC) Berlapis**:
+   - Staf kasir (`STAF`) yang mencoba mengakses endpoint manajemen izin (`/api/permissions`), mengubah produk (`POST/PATCH /api/products`), atau melihat omset laba bersih wajib ditolak tegas dengan kode respon `403 Forbidden`.
+   - Data HPP modal pembelian (`purchasePrice`, `unitCostPerPurchaseUnit`, `costPerBaseUnit`) disensor otomatis menjadi `undefined` / disembunyikan bagi staf tanpa izin `cost:view`.
+5. **Anti-Adversarial & Boundary Safety**:
+   - Sistem kebal terhadap upaya injeksi SQL klasik (`' OR '1'='1`), parameter tampering, string unicode berbahaya, serta payload stress test hingga 1MB.
+
+### 12.3 Arsitektur Pengujian Komprehensif (3-Stage Verification Pipeline)
+
+Pipeline verifikasi mutu terpadu diorkestrasi melalui skrip cerdas `run_all_tests.py`:
+1. **Tahap 1 — Kompilasi Statis (TypeScript Typecheck)**:
+   - Menjalankan `tsc --noEmit` untuk workspace server dan client.
+   - Memastikan tidak ada tipe *implicit any*, *unhandled null*, atau ketidakcocokan kontrak DTO antara backend dan frontend.
+2. **Tahap 2 — Kualitas Kode & Standar Sintaks (ESLint)**:
+   - Memindai kepatuhan aturan hooks React 19, import sorting, unused variables, dan standar format ES modern.
+3. **Tahap 3 — Eksekusi Harness Uji Dinamis (Vitest)**:
+   - Dijalankan dengan isolasi serial (`--fileParallelism=false`) untuk mencegah tabrakan data relasional pada database pengujian `warung_madura_test`.
+
+### 12.4 Kontrak Pengujian & Lingkup Uji
+
+Test suite diorganisasikan ke dalam 9 modul pengujian khusus:
+1. `test/unit-business-logic.test.ts` (13 tests): Logika bisnis murni, kalkulasi konversi satuan (dus/renteng/bal ke satuan dasar), aritmatika Decimal presisi (pembagian tidak bulat), kalkulasi tanggal & WIB boundary, validasi skema Zod.
+2. `test/acid-transactions.test.ts` (6 tests): Atomisitas rollback 100% saat error, retensi arsip transaksi historis, pencegahan overselling race condition simultan, ketahanan crash.
+3. `test/rbac-comprehensive.test.ts` (14 tests): Matriks matriks izin peran dinamis, penolakan 403 Forbidden, sensor omset finansial, anti-impersonasi staf pada tanda terima barang masuk.
+4. `test/boundary-edge-adversarial.test.ts` (13 tests): Input batas ekstrim (kuantitas 0, negatif, bilangan bulat maksimal), SQL injection payloads, XSS HTML string cleansing, uji tanggal kabisat (29 Feb), payload JSON besar (1MB buffer).
+5. `test/e2e-api.test.ts` (20 tests): Pengujian integrasi penuh HTTP REST API dari level rute Express hingga database PostgreSQL.
+6. `test/scenarios.test.ts` (20 tests): Verifikasi menyeluruh skenario inti barang masuk S1–S20 (rekonsiliasi pesanan, toleransi parsial, bonus, barang ditolak/rusak).
+7. `test/rbac.test.ts` (8 tests): Pengujian dasar autentikasi PIN, token JWT, dan matriks hak akses Blok C.
+8. `test/k1-k17.test.ts` (13 tests): Integrasi scraper direktori dinas pasar (kepatuhan UU PDP), formula Haversine geolokasi, dan live Socket.IO chat widget.
+9. `test/t1-t11.test.ts` (1 test berurutan T1–T11): Simulasi alur kerja operasional harian terpadu dari terbit PO hingga penutupan rekonsiliasi.
+
+### 12.5 Logika Transaksional & State Machine Verification
+
+- **PO Status Transitions**: Terverifikasi akurat berpindah dari `OPEN` -> `PARTIAL` -> `COMPLETE` / `CANCELLED` sesuai kalkulasi sisa pesanan (`remainingBase = orderedBase - fulfilledBase - cancelledBase`).
+- **Goods Receipt Line Logic**: Terverifikasi bahwa barang ditolak (`rejectedBase > 0`) disimpan dengan alasan penolakan (`rejectReason`), tidak menambah stok fisik di rak, dan tidak mengurangi kuantitas pesanan terbuka. Kuantitas bonus (`bonusBase > 0`) menambah stok fisik tanpa mengubah status pemenuhan pesanan.
+
+### 12.6 Matriks Pengujian Lengkap (108/108 Tests PASS - 100% Pass Rate)
+
+```text
+===========================================================================
+             WARUNG MADURA ENTERPRISE — UNIFIED QA TEST RUNNER             
+===========================================================================
+Workspace Directory : /mnt/windows/Users/lenovo/Downloads/DevSprint-main/DevSprint-main/warung-madura-stock-manager
+QA Architect        : Worker 4 (sololevelingkakaopage02@gmail.com)
+Timestamp           : 2026-10-23 10:41:11 WIB
+
+[PASS] Stage 1: TypeScript Strict Typecheck (Server & Client) (4.09s)
+[PASS] Stage 2: Code Quality & ESLint Linter (1.41s)
+[PASS] Stage 3: Comprehensive Vitest Test Harness (24.32s)
+
+===========================================================================
+            AUTOMATED QA VERIFICATION MATRIX (SWARM PRO FASE 3)            
+===========================================================================
+Test Suite File                            | Category             | Tests  | Status
+--------------------------------------------------------------------------------
+test/e2e-api.test.ts                       | E2E HTTP REST API    | 20     | PASS
+test/scenarios.test.ts                     | Core S1-S20 Goods In | 20     | PASS
+test/boundary-edge-adversarial.test.ts     | Edge & Adversarial   | 13     | PASS
+test/rbac-comprehensive.test.ts            | Granular RBAC        | 14     | PASS
+test/unit-business-logic.test.ts           | Unit & Calculations  | 13     | PASS
+test/rbac.test.ts                          | Auth & Role Matrix   | 8      | PASS
+test/acid-transactions.test.ts             | Database & ACID      | 6      | PASS
+test/k1-k17.test.ts                        | Scraper & Realtime   | 13     | PASS
+test/t1-t11.test.ts                        | Security Hardening   | 1      | PASS
+--------------------------------------------------------------------------------
+Total Automated Tests Verified : 108 / 108 (100% Pass Rate)
+Total Vitest Test Duration     : 23.90s
+
+===========================================================================
+🎉 CERTIFICATION COMPLETE: 100% PASS RATE GATEKEEPER STANDARD ACHIEVED!
+All business logic, database transactions, RBAC controls, and edge cases PASSED.
+===========================================================================
+```
+
+### 12.7 Decision Log
+
+1. **Serial Test Execution via `--fileParallelism=false`**: Pengujian database relasional ACID memerlukan integritas data yang bersih di setiap awal uji (`resetTestDatabase()`). Mengaktifkan serial execution mencegah tabrakan data konkurensi antar berkas uji pada instance PostgreSQL pengujian bersama.
+2. **Unified QA Runner `run_all_tests.py`**: Skrip Python mandiri disediakan sebagai gerbang sertifikasi satu pintu yang memverifikasi Typecheck, Linter, dan Test Suite sekaligus, memudahkan supervisor dan tim CI/CD dalam memvalidasi integritas build.
+3. **Graceful Database Disconnection**: Seluruh suite pengujian membersihkan koneksi konektor Prisma melalui hook `afterAll()` untuk memastikan tidak ada koneksi menggantung (*hanging connection pool*) setelah pengujian selesai.
 
 

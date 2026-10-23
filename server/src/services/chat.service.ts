@@ -1,0 +1,197 @@
+import { db } from "../lib/db.js";
+import { ForbiddenError, NotFoundError, ConflictError } from "../lib/errors.js";
+
+export class ChatService {
+  /**
+   * Helper pairKey unik agar dua orang membuka chat dua kali mengarah ke percakapan yang sama (K5)
+   */
+  static generatePairKey(userAId: string, userBId: string): string {
+    return [userAId, userBId].sort().join(":");
+  }
+
+  /**
+   * Membuka atau mendapatkan percakapan yang sudah ada antara 2 pengguna (K5)
+   */
+  static async getOrCreateConversation(initiatorUserId: string, targetUserId: string) {
+    if (initiatorUserId === targetUserId) {
+      throw new ConflictError("Tidak bisa membuat percakapan dengan diri sendiri");
+    }
+
+    // Pastikan kedua pengguna ada
+    const users = await db.user.findMany({
+      where: { id: { in: [initiatorUserId, targetUserId] } },
+    });
+    if (users.length < 2) {
+      throw new NotFoundError("Salah satu pengguna tidak ditemukan");
+    }
+
+    const pairKey = this.generatePairKey(initiatorUserId, targetUserId);
+
+    let conversation = await db.conversation.findUnique({
+      where: { pairKey },
+      include: {
+        members: {
+          include: {
+            user: {
+              select: { id: true, name: true, username: true, role: true },
+            },
+          },
+        },
+      },
+    });
+
+    if (!conversation) {
+      conversation = await db.conversation.create({
+        data: {
+          pairKey,
+          members: {
+            create: [
+              { userId: initiatorUserId },
+              { userId: targetUserId },
+            ],
+          },
+        },
+        include: {
+          members: {
+            include: {
+              user: {
+                select: { id: true, name: true, username: true, role: true },
+              },
+            },
+          },
+        },
+      });
+    }
+
+    return conversation;
+  }
+
+  /**
+   * Pengecekan anggota percakapan anti-IDOR (K8)
+   */
+  static async assertMember(conversationId: string, userId: string) {
+    const member = await db.conversationMember.findUnique({
+      where: {
+        conversationId_userId: {
+          conversationId,
+          userId,
+        },
+      },
+    });
+
+    if (!member) {
+      throw new ForbiddenError("Anda bukan anggota dari percakapan ini (Akses Ditolak)");
+    }
+
+    return member;
+  }
+
+  /**
+   * Menyimpan pesan ke database dengan idempotency clientMessageId (K6, K7)
+   */
+  static async sendMessage(
+    conversationId: string,
+    senderId: string,
+    clientMessageId: string,
+    body: string
+  ) {
+    // 1. Cek keanggotaan anti-IDOR (K8)
+    await this.assertMember(conversationId, senderId);
+
+    // 2. Idempotency check: jika clientMessageId sudah ada untuk pengirim ini, return pesan yang sama (K7)
+    const existing = await db.message.findUnique({
+      where: {
+        senderId_clientMessageId: {
+          senderId,
+          clientMessageId,
+        },
+      },
+      include: {
+        sender: {
+          select: { id: true, name: true, username: true },
+        },
+      },
+    });
+
+    if (existing) {
+      return existing;
+    }
+
+    // 3. Simpan pesan baru secara atomik (Database SSOT)
+    const [message] = await db.$transaction([
+      db.message.create({
+        data: {
+          conversationId,
+          senderId,
+          clientMessageId,
+          body,
+        },
+        include: {
+          sender: {
+            select: { id: true, name: true, username: true },
+          },
+        },
+      }),
+      db.conversation.update({
+        where: { id: conversationId },
+        data: { lastMessageAt: new Date() },
+      }),
+    ]);
+
+    return message;
+  }
+
+  /**
+   * Mengambil riwayat pesan sejak kursor tertentu (K9)
+   */
+  static async getMessages(conversationId: string, userId: string, afterSeqId?: number) {
+    // Anti-IDOR (K8)
+    await this.assertMember(conversationId, userId);
+
+    return db.message.findMany({
+      where: {
+        conversationId,
+        ...(afterSeqId ? { seqId: { gt: afterSeqId } } : {}),
+      },
+      include: {
+        sender: {
+          select: { id: true, name: true, username: true },
+        },
+      },
+      orderBy: { seqId: "asc" },
+    });
+  }
+
+  /**
+   * Mengambil daftar percakapan aktif milik seorang user
+   */
+  static async listUserConversations(userId: string) {
+    return db.conversation.findMany({
+      where: {
+        members: {
+          some: { userId },
+        },
+      },
+      include: {
+        members: {
+          include: {
+            user: {
+              select: { id: true, name: true, username: true, role: true },
+            },
+          },
+        },
+        messages: {
+          take: 1,
+          orderBy: { createdAt: "desc" },
+          select: {
+            id: true,
+            body: true,
+            createdAt: true,
+            sender: { select: { id: true, name: true } },
+          },
+        },
+      },
+      orderBy: { lastMessageAt: "desc" },
+    });
+  }
+}
