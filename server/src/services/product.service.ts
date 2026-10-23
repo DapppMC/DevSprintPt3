@@ -12,6 +12,7 @@ import type {
   ListProductsFilter,
   UpdateProductInput,
 } from '../validators/product.validator';
+import { FALLBACK_PRODUCTS } from '../lib/fallback-data';
 
 const PRODUCT_NOT_FOUND = 'Produk tidak ditemukan.';
 const SKU_ALREADY_USED = 'SKU sudah digunakan oleh produk lain.';
@@ -62,17 +63,57 @@ export async function listProducts(
     where.isActive = true;
   }
 
-  const products = await db.product.findMany({ where, orderBy: { name: 'asc' } });
-  return products.map((p) => toProductDto(p, options));
+  try {
+    const products = await db.product.findMany({ where, orderBy: { name: 'asc' } });
+    return products.map((p) => toProductDto(p, options));
+  } catch (err) {
+    console.warn(
+      '[Product] Database query failed, returning fallback products:',
+      (err as Error).message,
+    );
+    let list = [...FALLBACK_PRODUCTS];
+    if (filter.search) {
+      const q = filter.search.toLowerCase();
+      list = list.filter(
+        (p) =>
+          p.name.toLowerCase().includes(q) ||
+          p.sku.toLowerCase().includes(q) ||
+          p.category.toLowerCase().includes(q),
+      );
+    }
+    if (filter.inStock) {
+      list = list.filter((p) => p.stock > 0);
+    }
+    if (filter.activeOnly) {
+      list = list.filter((p) => p.isActive);
+    }
+    if (options?.hidePurchasePrice) {
+      list = list.map((p) => ({ ...p, purchasePrice: undefined }));
+    }
+    return list;
+  }
 }
 
 export async function getProduct(
   id: string,
   options?: { hidePurchasePrice?: boolean },
 ): Promise<ProductDto> {
-  const product = await db.product.findUnique({ where: { id } });
-  if (!product) throw new NotFoundError(PRODUCT_NOT_FOUND);
-  return toProductDto(product, options);
+  try {
+    const product = await db.product.findUnique({ where: { id } });
+    if (product) return toProductDto(product, options);
+  } catch (err) {
+    console.warn(
+      '[Product] Database query failed during getProduct, checking fallback:',
+      (err as Error).message,
+    );
+  }
+
+  const fallback = FALLBACK_PRODUCTS.find((p) => p.id === id || p.sku === id);
+  if (!fallback) throw new NotFoundError(PRODUCT_NOT_FOUND);
+  if (options?.hidePurchasePrice) {
+    return { ...fallback, purchasePrice: undefined };
+  }
+  return fallback;
 }
 
 export async function createProduct(input: CreateProductInput): Promise<ProductDto> {

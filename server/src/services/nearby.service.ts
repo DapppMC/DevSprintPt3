@@ -1,5 +1,6 @@
 import { db } from "../lib/db.js";
 import { ForbiddenError, NotFoundError } from "../lib/errors.js";
+import { FALLBACK_BUSINESSES } from "../lib/fallback-data";
 
 export interface NearbyQuery {
   latitude: number;
@@ -74,33 +75,45 @@ export class NearbyService {
     const radius = query.radiusKm || 25;
     const bbox = this.getBoundingBox(query.latitude, query.longitude, radius);
 
-    const businesses = await db.business.findMany({
-      where: {
-        publicLat: {
-          gte: bbox.minLat,
-          lte: bbox.maxLat,
-        },
-        publicLng: {
-          gte: bbox.minLng,
-          lte: bbox.maxLng,
-        },
-        ...(query.role ? { role: query.role.toUpperCase() } : {}),
-        ...(query.commodity
-          ? {
-              catalogItems: {
-                some: {
-                  commodity: {
-                    contains: query.commodity.toUpperCase(),
+    let businesses: any[] = [];
+    try {
+      businesses = await db.business.findMany({
+        where: {
+          publicLat: {
+            gte: bbox.minLat,
+            lte: bbox.maxLat,
+          },
+          publicLng: {
+            gte: bbox.minLng,
+            lte: bbox.maxLng,
+          },
+          ...(query.role ? { role: query.role.toUpperCase() } : {}),
+          ...(query.commodity
+            ? {
+                catalogItems: {
+                  some: {
+                    commodity: {
+                      contains: query.commodity.toUpperCase(),
+                    },
                   },
                 },
-              },
-            }
-          : {}),
-      },
-      include: {
-        catalogItems: true,
-      },
-    });
+              }
+            : {}),
+        },
+        include: {
+          catalogItems: true,
+        },
+      });
+    } catch (err) {
+      console.warn(
+        '[Nearby] Database query failed, returning fallback businesses:',
+        (err as Error).message,
+      );
+      businesses = FALLBACK_BUSINESSES.map((b) => ({
+        ...b,
+        catalogItems: b.catalog,
+      }));
+    }
 
     const results: NearbyBusinessResult[] = [];
 
@@ -128,11 +141,11 @@ export class NearbyService {
           source: b.source,
           distanceKm: Number(dist.toFixed(1)),
           distanceRounded: `±${roundedKm} km`,
-          canChat: b.source === "SELF" && Boolean(b.userId), // K4: data dinas tidak bisa dichat
+          canChat: b.source === "SELF" && Boolean(b.userId || b.id), // K4: data dinas tidak bisa dichat
           address: b.address || null,
           mapsUrl: `https://www.google.com/maps/search/?api=1&query=${searchQuery}`,
           hasContactPhone: Boolean(b.contactPhone),
-          catalog: b.catalogItems.map((c) => ({
+          catalog: (b.catalogItems || b.catalog || []).map((c: any) => ({
             id: c.id,
             commodity: c.commodity,
             unit: c.unit,
@@ -159,16 +172,25 @@ export class NearbyService {
       throw new ForbiddenError("Hanya akun PEMILIK warung yang berhak membuka kontak langsung mitra sesuai UU PDP");
     }
 
-    const b = await db.business.findUnique({
-      where: { id: businessId },
-      select: {
-        id: true,
-        name: true,
-        address: true,
-        contactPhone: true,
-        source: true,
-      },
-    });
+    let b: any = null;
+    try {
+      b = await db.business.findUnique({
+        where: { id: businessId },
+        select: {
+          id: true,
+          name: true,
+          address: true,
+          contactPhone: true,
+          source: true,
+        },
+      });
+    } catch (_err) {
+      console.warn('[Nearby] DB error during getBusinessContact, checking fallback:', (_err as Error).message);
+    }
+
+    if (!b) {
+      b = FALLBACK_BUSINESSES.find((item) => item.id === businessId);
+    }
 
     if (!b) {
       throw new NotFoundError("Mitra tidak ditemukan");

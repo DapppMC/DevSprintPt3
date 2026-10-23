@@ -20,6 +20,7 @@
 | 11 Swarm Pro Polish & Overhaul: Fase 1 (Contract Architect) | ✅ selesai | Dokumen kontrak arsitektur formal (`01-contract.md` & `architecture_spec.json`), Logo Warung Madura asli, Kontrak High-Contrast Dark Mode, Kebijakan Zero-Emoji (Lucide SVG murni), Dataset Seeding Evaluasi Atasan (PO 4 status, GR 3 variasi, audit mutasi lengkap), 108/108 Vitest PASS terverifikasi. |
 | 12 Swarm Pro Polish & Overhaul: Fase 3 (Lead QA & Testing Architect) | ✅ selesai | Audit seluruh file Worker 1-3, Eksekusi Automated Runner `run_all_tests.py`, Stage 1 Typecheck (0 Error), Stage 2 ESLint (0 Error), Stage 3 Vitest 108/108 PASS (100% Pass Rate), ACID Rollback & Concurrency Lock, Granular RBAC 403, Edge/Adversarial, Gatekeeper Certified. |
 | 13 Ship to Live (GCP Cloud Run & GitHub Push) | ✅ selesai | Push versi final monorepo ke `upstream/student2` (`padinadi01/DevSprintPt3`), `fork/student2` & `fork/main` (`DapppMC/DevSprintPt3`), serta `origin/main` (`DapppMC/DevSprint-WarungMadura`). CI Build & Test Verification GitHub Actions #39931560390 SUCCEEDED (1m11s), auto-deploy Google Cloud Run `app-student2` aktif dengan schema Supabase `student2`. |
+| 14 Resilient Cloud Run Resilience & Anti-Bounce | ✅ selesai | Mengatasi issue mental ke sign-in page: trust proxy di Express, auto-whitelist rate limiter untuk Cak Rofi/Udin/Sari, dan in-memory graceful fallback di seluruh service backend ketika Supabase offline. 108/108 Vitest PASS. |
 
 ---
 

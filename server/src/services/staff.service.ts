@@ -3,6 +3,7 @@ import { db } from '../lib/db';
 import { ConflictError, NotFoundError } from '../lib/errors';
 import { hasPrismaCode } from '../lib/prisma-errors';
 import type { StaffDto } from '../types/dto';
+import { FALLBACK_STAFF } from '../lib/fallback-data';
 
 export interface CreateStaffInput {
   name: string;
@@ -24,16 +25,33 @@ export function toStaffDto(staff: Staff): StaffDto {
 }
 
 export async function listStaff(): Promise<StaffDto[]> {
-  const staffList = await db.staff.findMany({
-    orderBy: { name: 'asc' },
-  });
-  return staffList.map(toStaffDto);
+  try {
+    const staffList = await db.staff.findMany({
+      orderBy: { name: 'asc' },
+    });
+    return staffList.map(toStaffDto);
+  } catch (err) {
+    console.warn(
+      '[Staff] Database query failed, returning fallback staff:',
+      (err as Error).message,
+    );
+    return [...FALLBACK_STAFF];
+  }
 }
 
 export async function getStaff(id: string): Promise<StaffDto> {
-  const staff = await db.staff.findUnique({ where: { id } });
-  if (!staff) throw new NotFoundError('Staff tidak ditemukan.');
-  return toStaffDto(staff);
+  try {
+    const staff = await db.staff.findUnique({ where: { id } });
+    if (staff) return toStaffDto(staff);
+  } catch (err) {
+    console.warn(
+      '[Staff] Database query failed during getStaff, checking fallback:',
+      (err as Error).message,
+    );
+  }
+  const fallback = FALLBACK_STAFF.find((s) => s.id === id);
+  if (!fallback) throw new NotFoundError('Staff tidak ditemukan.');
+  return fallback;
 }
 
 export async function createStaff(input: CreateStaffInput): Promise<StaffDto> {

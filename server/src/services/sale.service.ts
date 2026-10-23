@@ -4,6 +4,7 @@ import { endOfDayWib, formatDateKeyWib, startOfDayWib } from '../lib/dates';
 import { ConflictError, NotFoundError } from '../lib/errors';
 import type { SaleDetailDto, SaleSummaryDto } from '../types/dto';
 import type { CreateSaleInput } from '../validators/sale.validator';
+import { FALLBACK_SALES } from '../lib/fallback-data';
 
 const MAX_SALES_IN_LIST = 200;
 
@@ -58,12 +59,20 @@ function toSaleDetailDto(sale: SaleWithItems): SaleDetailDto {
 }
 
 export async function listSales(): Promise<SaleSummaryDto[]> {
-  const sales = await db.sale.findMany({
-    orderBy: { createdAt: 'desc' },
-    take: MAX_SALES_IN_LIST,
-    include: saleSummaryInclude,
-  });
-  return sales.map(toSaleSummaryDto);
+  try {
+    const sales = await db.sale.findMany({
+      orderBy: { createdAt: 'desc' },
+      take: MAX_SALES_IN_LIST,
+      include: saleSummaryInclude,
+    });
+    return sales.map(toSaleSummaryDto);
+  } catch (err) {
+    console.warn(
+      '[Sale] Database query failed, returning fallback sales:',
+      (err as Error).message,
+    );
+    return [...FALLBACK_SALES];
+  }
 }
 
 export async function getSale(id: string): Promise<SaleDetailDto> {

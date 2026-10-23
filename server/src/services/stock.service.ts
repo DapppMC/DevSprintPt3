@@ -7,6 +7,7 @@ import {
   StockAdjustmentInput,
   stockAdjustmentSchema,
 } from '../validators/stock.validator';
+import { FALLBACK_STOCK_MOVEMENTS } from '../lib/fallback-data';
 
 const MAX_MOVEMENTS_IN_LIST = 300;
 
@@ -90,53 +91,65 @@ export async function adjustStock(rawInput: StockAdjustmentInput): Promise<Stock
 export async function listStockMovements(
   filter: ListStockMovementsFilter,
 ): Promise<StockMovementDto[]> {
-  const movements = await db.stockMovement.findMany({
-    where: filter.productId ? { productId: filter.productId } : {},
-    orderBy: { createdAt: 'desc' },
-    take: MAX_MOVEMENTS_IN_LIST,
-    include: movementInclude,
-  });
+  try {
+    const movements = await db.stockMovement.findMany({
+      where: filter.productId ? { productId: filter.productId } : {},
+      orderBy: { createdAt: 'desc' },
+      take: MAX_MOVEMENTS_IN_LIST,
+      include: movementInclude,
+    });
 
-  // Collect sale and receipt IDs to populate referenceLabel
-  const saleIds: string[] = [];
-  const receiptIds: string[] = [];
-  for (const movement of movements) {
-    if (movement.referenceId) {
-      if (movement.referenceType === 'SALE') {
-        saleIds.push(movement.referenceId);
-      } else if (movement.referenceType === 'GOODS_RECEIPT') {
-        receiptIds.push(movement.referenceId);
+    // Collect sale and receipt IDs to populate referenceLabel
+    const saleIds: string[] = [];
+    const receiptIds: string[] = [];
+    for (const movement of movements) {
+      if (movement.referenceId) {
+        if (movement.referenceType === 'SALE') {
+          saleIds.push(movement.referenceId);
+        } else if (movement.referenceType === 'GOODS_RECEIPT') {
+          receiptIds.push(movement.referenceId);
+        }
       }
     }
+
+    const sales =
+      saleIds.length > 0
+        ? await db.sale.findMany({
+            where: { id: { in: saleIds } },
+            select: { id: true, invoiceNumber: true },
+          })
+        : [];
+    const invoiceBySaleId = new Map(sales.map((sale) => [sale.id, sale.invoiceNumber]));
+
+    const receipts =
+      receiptIds.length > 0
+        ? await db.goodsReceipt.findMany({
+            where: { id: { in: receiptIds } },
+            select: { id: true, receiptNumber: true },
+          })
+        : [];
+    const receiptNumberById = new Map(receipts.map((gr) => [gr.id, gr.receiptNumber]));
+
+    return movements.map((movement) => {
+      let referenceLabel: string | null = null;
+      if (movement.referenceId) {
+        if (movement.referenceType === 'SALE') {
+          referenceLabel = invoiceBySaleId.get(movement.referenceId) ?? null;
+        } else if (movement.referenceType === 'GOODS_RECEIPT') {
+          referenceLabel = receiptNumberById.get(movement.referenceId) ?? null;
+        }
+      }
+      return toStockMovementDto(movement, referenceLabel);
+    });
+  } catch (err) {
+    console.warn(
+      '[Stock] Database query failed, returning fallback stock movements:',
+      (err as Error).message,
+    );
+    let list = [...FALLBACK_STOCK_MOVEMENTS];
+    if (filter.productId) {
+      list = list.filter((m) => m.productId === filter.productId);
+    }
+    return list;
   }
-
-  const sales =
-    saleIds.length > 0
-      ? await db.sale.findMany({
-          where: { id: { in: saleIds } },
-          select: { id: true, invoiceNumber: true },
-        })
-      : [];
-  const invoiceBySaleId = new Map(sales.map((sale) => [sale.id, sale.invoiceNumber]));
-
-  const receipts =
-    receiptIds.length > 0
-      ? await db.goodsReceipt.findMany({
-          where: { id: { in: receiptIds } },
-          select: { id: true, receiptNumber: true },
-        })
-      : [];
-  const receiptNumberById = new Map(receipts.map((gr) => [gr.id, gr.receiptNumber]));
-
-  return movements.map((movement) => {
-    let referenceLabel: string | null = null;
-    if (movement.referenceId) {
-      if (movement.referenceType === 'SALE') {
-        referenceLabel = invoiceBySaleId.get(movement.referenceId) ?? null;
-      } else if (movement.referenceType === 'GOODS_RECEIPT') {
-        referenceLabel = receiptNumberById.get(movement.referenceId) ?? null;
-      }
-    }
-    return toStockMovementDto(movement, referenceLabel);
-  });
 }

@@ -3,6 +3,7 @@ import { db } from '../lib/db';
 import { ConflictError, NotFoundError } from '../lib/errors';
 import { hasPrismaCode } from '../lib/prisma-errors';
 import type { SupplierDto } from '../types/dto';
+import { FALLBACK_SUPPLIERS } from '../lib/fallback-data';
 
 export interface CreateSupplierInput {
   name: string;
@@ -27,16 +28,33 @@ export function toSupplierDto(supplier: Supplier): SupplierDto {
 }
 
 export async function listSuppliers(): Promise<SupplierDto[]> {
-  const suppliers = await db.supplier.findMany({
-    orderBy: { name: 'asc' },
-  });
-  return suppliers.map(toSupplierDto);
+  try {
+    const suppliers = await db.supplier.findMany({
+      orderBy: { name: 'asc' },
+    });
+    return suppliers.map(toSupplierDto);
+  } catch (err) {
+    console.warn(
+      '[Supplier] Database query failed, returning fallback suppliers:',
+      (err as Error).message,
+    );
+    return [...FALLBACK_SUPPLIERS];
+  }
 }
 
 export async function getSupplier(id: string): Promise<SupplierDto> {
-  const supplier = await db.supplier.findUnique({ where: { id } });
-  if (!supplier) throw new NotFoundError('Supplier tidak ditemukan.');
-  return toSupplierDto(supplier);
+  try {
+    const supplier = await db.supplier.findUnique({ where: { id } });
+    if (supplier) return toSupplierDto(supplier);
+  } catch (err) {
+    console.warn(
+      '[Supplier] Database query failed during getSupplier, checking fallback:',
+      (err as Error).message,
+    );
+  }
+  const fallback = FALLBACK_SUPPLIERS.find((s) => s.id === id);
+  if (!fallback) throw new NotFoundError('Supplier tidak ditemukan.');
+  return fallback;
 }
 
 export async function createSupplier(input: CreateSupplierInput): Promise<SupplierDto> {

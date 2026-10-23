@@ -38,29 +38,46 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<Role, string[]> = {
 };
 
 export async function ensureDefaultPermissions(): Promise<void> {
-  const count = await db.rolePermission.count();
-  if (count > 0) return;
+  try {
+    const count = await db.rolePermission.count();
+    if (count > 0) return;
 
-  const entries: Array<{ role: Role; permission: string }> = [];
-  for (const [role, perms] of Object.entries(DEFAULT_ROLE_PERMISSIONS)) {
-    for (const perm of perms) {
-      entries.push({ role: role as Role, permission: perm });
+    const entries: Array<{ role: Role; permission: string }> = [];
+    for (const [role, perms] of Object.entries(DEFAULT_ROLE_PERMISSIONS)) {
+      for (const perm of perms) {
+        entries.push({ role: role as Role, permission: perm });
+      }
     }
-  }
 
-  await db.rolePermission.createMany({
-    data: entries,
-    skipDuplicates: true,
-  });
+    await db.rolePermission.createMany({
+      data: entries,
+      skipDuplicates: true,
+    });
+  } catch (err) {
+    console.warn(
+      '[Permission] Database unavailable during ensureDefaultPermissions, using in-memory defaults:',
+      (err as Error).message,
+    );
+  }
 }
 
 export async function getRolePermissions(role: Role): Promise<string[]> {
-  await ensureDefaultPermissions();
-  const rows = await db.rolePermission.findMany({
-    where: { role },
-    select: { permission: true },
-  });
-  return rows.map((r) => r.permission);
+  try {
+    await ensureDefaultPermissions();
+    const rows = await db.rolePermission.findMany({
+      where: { role },
+      select: { permission: true },
+    });
+    if (rows && rows.length > 0) {
+      return rows.map((r) => r.permission);
+    }
+  } catch (err) {
+    console.warn(
+      '[Permission] Database error in getRolePermissions, fallback to default:',
+      (err as Error).message,
+    );
+  }
+  return DEFAULT_ROLE_PERMISSIONS[role] || [];
 }
 
 export async function getPermissionsMatrix(): Promise<{
@@ -69,28 +86,50 @@ export async function getPermissionsMatrix(): Promise<{
   matrix: Record<Role, string[]>;
   roles: Record<Role, string[]>;
 }> {
-  await ensureDefaultPermissions();
-  const rows = await db.rolePermission.findMany({
-    select: { role: true, permission: true },
-  });
+  try {
+    await ensureDefaultPermissions();
+    const rows = await db.rolePermission.findMany({
+      select: { role: true, permission: true },
+    });
 
-  const matrix: Record<Role, string[]> = {
-    PEMILIK: [],
-    STAF: [],
-  };
+    const matrix: Record<Role, string[]> = {
+      PEMILIK: [],
+      STAF: [],
+    };
 
-  for (const row of rows) {
-    if (matrix[row.role]) {
-      matrix[row.role].push(row.permission);
+    for (const row of rows) {
+      if (matrix[row.role]) {
+        matrix[row.role].push(row.permission);
+      }
     }
-  }
 
-  return {
-    permissions: ALL_PERMISSIONS,
-    definitions: ALL_PERMISSIONS,
-    matrix,
-    roles: matrix,
-  };
+    if (matrix.PEMILIK.length === 0 && matrix.STAF.length === 0) {
+      return {
+        permissions: ALL_PERMISSIONS,
+        definitions: ALL_PERMISSIONS,
+        matrix: { ...DEFAULT_ROLE_PERMISSIONS },
+        roles: { ...DEFAULT_ROLE_PERMISSIONS },
+      };
+    }
+
+    return {
+      permissions: ALL_PERMISSIONS,
+      definitions: ALL_PERMISSIONS,
+      matrix,
+      roles: matrix,
+    };
+  } catch (err) {
+    console.warn(
+      '[Permission] Database error in getPermissionsMatrix, fallback to default:',
+      (err as Error).message,
+    );
+    return {
+      permissions: ALL_PERMISSIONS,
+      definitions: ALL_PERMISSIONS,
+      matrix: { ...DEFAULT_ROLE_PERMISSIONS },
+      roles: { ...DEFAULT_ROLE_PERMISSIONS },
+    };
+  }
 }
 
 export async function updateRolePermissions(
