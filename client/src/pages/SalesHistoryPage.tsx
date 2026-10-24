@@ -180,7 +180,7 @@ export function SalesHistoryPage() {
           {loadingDetail && <LoadingState label="Memuat rincian transaksi..." />}
           {activeSaleDetail && (
             <div className="space-y-4 text-xs">
-              <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 p-4 flex justify-between items-center">
+              <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/80 p-4 flex justify-between items-center">
                 <div>
                   <span className="text-slate-500 dark:text-slate-400 font-medium">Nomor Nota:</span>
                   <p className="font-mono font-bold text-slate-900 dark:text-slate-100 text-sm">
@@ -212,7 +212,7 @@ export function SalesHistoryPage() {
                         <tr key={item.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50">
                           <td className={tdClass}>
                             <span className="font-bold text-slate-900 dark:text-slate-100 block">{item.productName}</span>
-                            <span className="font-mono text-[11px] text-slate-400 dark:text-slate-500">{item.productSku}</span>
+                            <span className="font-mono text-[11px] text-slate-400 dark:text-slate-400">{item.productSku}</span>
                           </td>
                           <td className={`${tdClass} text-right font-mono font-bold text-slate-800 dark:text-slate-200`}>
                             {item.quantity}

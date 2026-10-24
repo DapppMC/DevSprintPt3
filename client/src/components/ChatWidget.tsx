@@ -987,7 +987,7 @@ export function ChatWidget() {
                                 href={b.mapsUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex-1 inline-flex items-center justify-center gap-1.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-semibold hover:bg-slate-50 dark:hover:bg-slate-750 transition-transform duration-100 ease-out shadow-2xs"
+                                className="flex-1 inline-flex items-center justify-center gap-1.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-semibold hover:bg-slate-50 dark:hover:bg-slate-700 transition-transform duration-100 ease-out shadow-2xs"
                               >
                                 <Map className="h-3.5 w-3.5 text-slate-500 dark:text-slate-400" />
                                 <span>Maps</span>

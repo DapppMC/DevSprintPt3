@@ -152,7 +152,7 @@ export function Layout() {
               <Search className="h-3.5 w-3.5 text-slate-400 group-hover:text-emerald-600" />
               <span>Cari atau aksi...</span>
             </span>
-            <kbd className="hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-mono rounded bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-500">
+            <kbd className="hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-mono rounded bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-200">
               <Command className="h-2.5 w-2.5" />K
             </kbd>
           </button>
@@ -165,7 +165,7 @@ export function Layout() {
               <p className="font-bold text-slate-800 dark:text-slate-200 truncate max-w-[120px]">
                 {user ? user.name : 'Belum Login'}
               </p>
-              <p className="text-slate-400 dark:text-slate-500 font-mono text-[11px]">@{user?.username ?? '-'}</p>
+              <p className="text-slate-500 dark:text-slate-400 font-mono text-[11px]">@{user?.username ?? '-'}</p>
             </div>
             {user && (
               <div className="flex items-center gap-1.5">
@@ -294,7 +294,7 @@ export function Layout() {
             >
               <Search className="h-3.5 w-3.5" />
               <span>Cari Command</span>
-              <kbd className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 font-mono text-[10px] text-slate-400">
+              <kbd className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 font-mono text-[10px] text-slate-500 dark:text-slate-300">
                 Ctrl+K
               </kbd>
             </button>

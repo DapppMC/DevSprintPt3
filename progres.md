@@ -25,6 +25,8 @@
 | 16 Windows Localhost Alignment & Database Sync | ✅ selesai | Restrukturisasi folder root (unnest DevSprint-main), pembuatan .env lokal, regenerasi shim Windows node_modules, sinkronisasi skema Prisma ke PostgreSQL 17 lokal (19 tabel), perbaikan seed invariant (SMB-001 stock non-negative), 108/108 Vitest PASS, verifikasi localhost:5001. |
 | 17 Local Daemon Launch & Port 8100 Activation | ✅ selesai | Perbaikan symlink /home/dapp/Projects/DevSprint, start container Docker dev-postgres, start production daemon server pada port 8100 (http://localhost:8100), verifikasi HTTP 200 SPA, API health ok, Socket.IO live, dan login Cak Rofi. |
 | 18 Planner System 3.0 & Multi-Agent Pro Overhaul | ✅ selesai | Bootstrapping BROWNFIELD, Cartography 23 entrypoints, Gate -1 Pinning & Golden Baseline (SHA256), Gate 1 EARS & Gate 2 Design Constitution (9/9 design_lint rules PASS), Express POS with Barcode & Quick Cash Tender, Thermal Receipt Modal 58/80mm, Command Palette (Ctrl+K), Executive Analytics (Gross Profit Margin, Top 5 Leaderboard, 7-Day Trend, Smart Restock Proposal), 108/108 Vitest PASS (100% Pass Rate), Localhost:5001 Live Daemon. |
+| 19 Production Hardening & Feedback Resolution | ✅ selesai | Resolusi shift switcher 1-klik, rate limiter whitelist PIN 4/6 digit, PO & GR detail slug regex, startup seeder Cloud Run, audit dark mode, README non-AI-slop, 108/108 Vitest PASS. |
+| 20 Full Dark Mode Text Legibility & Tailwind v4 Palette Normalization | ✅ selesai | Audit menyeluruh mode gelap, eliminasi utility invalid `slate-850`/`slate-750`, integrasi `@theme` di `index.css`, standardisasi contrast class JSX, 108/108 Vitest PASS, 9/9 Design Lint PASS. |
 
 ---
 
@@ -1123,3 +1125,53 @@ All business logic, database transactions, RBAC controls, and edge cases PASSED.
    - Menyelaraskan seluruh kelas warna pada `PermissionsPage.tsx`, `PurchaseOrdersPage.tsx`, `GoodsReceiptsPage.tsx`, `ChatWidget.tsx`, `Layout.tsx`, dan `LoginPage.tsx` agar mematuhi standar kontras WCAG AA.
 4. **README.md Portfolio-Grade**:
    - Membuat dokumentasi monorepo yang bersih, terstruktur, non-AI-slop, dilengkapi diagram arsitektur, panduan instalasi, dan matriks pengujian.
+
+---
+
+## 20. Tahap 20: Audit Keterbacaan Dark Mode Menyeluruh & Standardisasi Palet Warna Tailwind v4
+
+- **Tanggal:** 2026-10-24 17:35:00 WIB
+- **Pelaksana:** Antigravity 1 (Lead Orchestrator & Master Architect)
+- **Status:** ✅ Selesai (108/108 Vitest PASS, 9/9 Design Lint PASS, 0 Typecheck/Lint Error)
+
+### 20.1 Analisis Masalah Kritis (Root Cause Analysis)
+Saat beralih ke Dark Mode, pengguna mendapati beberapa card header dan panel checkout kasir masih berwarna abu-abu terang dengan teks yang nyaris tidak terlihat.
+
+1. **Investigasi Tailwind CSS v4 Engine**:
+   - Pada `client/src/index.css`, proyek mengadopsi Tailwind v4 (`@import 'tailwindcss';`).
+   - Komponen menggunakan class non-standar: `dark:bg-slate-850`, `dark:hover:bg-slate-750`, dan `dark:border-slate-750`.
+   - Palet warna default Tailwind CSS hanya menyediakan tingkatan 50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950. Tingkat `750` dan `850` tidak ada secara bawaan!
+   - Kompilator Tailwind v4 secara otomatis mengabaikan (*drop*) kelas utility yang tidak terdaftar, sehingga aturan CSS tersebut tidak dihasilkan ke dalam bundel akhir (terbukti dengan pencarian grep `slate-850` pada `client/dist/assets/*.css` menghasilkan 0 kemunculan).
+   - Akibatnya: elemen mempertahankan warna latar belakang light mode (`bg-slate-50/50` atau `bg-slate-50/70`), sementara teks di dalamnya beralih ke varian dark mode (`dark:text-slate-400` atau `dark:text-slate-100`), memicu tabrakan warna teks terang/putih di atas latar belakang terang yang tidak terbaca.
+
+### 20.2 Solusi & Implementasi Teknis (Defense-in-Depth)
+1. **Pendaftaran Token Kustom Tailwind v4**:
+   - Menambahkan blok `@theme` di `client/src/index.css`:
+     ```css
+     @theme {
+       --color-slate-750: #253347;
+       --color-slate-850: #151f30;
+     }
+     ```
+   - Memastikan kompilator Tailwind v4 secara resmi mengenali dan menghasilkan aturan CSS untuk utility kelas tersebut jika sewaktu-waktu digunakan.
+2. **Modernisasi Komponen ke Kelas Standar Kontras Tinggi**:
+   - Mengganti seluruh pemanggilan kelas non-standar di komponen JSX dengan kelas standar yang memiliki kontras tinggi:
+     - `DashboardPage.tsx`: Card header Leaderboard Produk Terlaris dan Penjualan Terbaru diubah dari `dark:bg-slate-850` menjadi `dark:bg-slate-800/80` dengan teks label tajam `text-slate-500 dark:text-slate-400`.
+     - `NewSalePage.tsx`: Header keranjang belanja diubah menjadi `dark:bg-slate-800/80` dan laci kasir bawah (*checkout drawer*) menjadi `dark:bg-slate-900/95` dengan total tagihan `text-emerald-700 dark:text-emerald-400`.
+     - `Modal.tsx`: Header modal menggunakan `dark:bg-slate-800/90`.
+     - `CommandPalette.tsx`: Bar pencarian dan footer launcher menggunakan `dark:bg-slate-800/90`.
+     - `AnalyticsCharts.tsx`: Kartu donut legend menggunakan `dark:bg-slate-800/60`.
+     - `StockHistoryPage.tsx`: Kartu node mutasi dan modal detail menggunakan `dark:bg-slate-800/80` dan `dark:hover:bg-slate-700`.
+     - `PurchaseOrdersPage.tsx`: Tab filter status menggunakan `dark:hover:bg-slate-700`.
+     - `ChatWidget.tsx`: Tombol Maps menggunakan `dark:hover:bg-slate-700`.
+     - `ui.ts`: `btnSecondary` menggunakan `dark:hover:bg-slate-700`, dan `labelClass` menggunakan `dark:text-slate-300`.
+     - `Layout.tsx`: Kbd shortcuts dan username staf diselaraskan dengan kontras tajam.
+     - `SaleDetailPage.tsx` & `SalesHistoryPage.tsx`: Latar belakang dan total transaksi kasir menggunakan kontras emerald tebal.
+
+### 20.3 Verifikasi Kualitas & Hasil Uji
+- `npm run typecheck`: 0 Error.
+- `npm run lint`: 0 Error.
+- `npm run build`: Berhasil mengompilasi CSS dan JS bundel tanpa error.
+- `python3 scripts/design_lint.py`: 9/9 PASS (R01-R09).
+- `python3 run_all_tests.py`: **108 / 108 PASS (100% Pass Rate)** dalam 24.35 detik.
+

@@ -115,7 +115,7 @@ export function DonutChart({ title, subtitle, data, centerLabel = 'Total' }: Don
                 className={`flex items-center justify-between gap-3 px-3 py-1.5 rounded-lg border text-xs cursor-pointer transition-transform duration-100 ease-out ${
                   isHovered
                     ? 'border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 shadow-xs scale-102'
-                    : 'border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-850 hover:bg-slate-50/70 dark:hover:bg-slate-800'
+                    : 'border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-800/60 hover:bg-slate-50/70 dark:hover:bg-slate-800'
                 }`}
               >
                 <div className="flex items-center gap-2">

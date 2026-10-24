@@ -336,14 +336,14 @@ export function DashboardPage() {
           <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
             {/* Top Selling Products Leaderboard */}
             <section className={cardClass}>
-              <div className="flex items-center justify-between border-b border-slate-200/90 dark:border-slate-800 px-5 py-4 bg-slate-50/50 dark:bg-slate-850">
+              <div className="flex items-center justify-between border-b border-slate-200/90 dark:border-slate-800 px-5 py-4 bg-slate-50/70 dark:bg-slate-800/80">
                 <div className="flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4 text-emerald-600 dark:text-emerald-500" />
+                  <TrendingUp className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                   <h2 className="font-bold text-sm text-slate-800 dark:text-slate-100">
                     Leaderboard Produk Terlaris (Fast-Moving)
                   </h2>
                 </div>
-                <span className="text-[11px] font-mono text-slate-400">Paling Laku</span>
+                <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400">Paling Laku</span>
               </div>
 
               {!dash.topProducts || dash.topProducts.length === 0 ? (
@@ -392,9 +392,9 @@ export function DashboardPage() {
 
             {/* Recent Sales Section */}
             <section className={cardClass}>
-              <div className="flex items-center justify-between border-b border-slate-200/90 dark:border-slate-800 px-5 py-4 bg-slate-50/50 dark:bg-slate-850">
+              <div className="flex items-center justify-between border-b border-slate-200/90 dark:border-slate-800 px-5 py-4 bg-slate-50/70 dark:bg-slate-800/80">
                 <div className="flex items-center gap-2">
-                  <Receipt className="h-4 w-4 text-emerald-600 dark:text-emerald-500" />
+                  <Receipt className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                   <h2 className="font-bold text-sm text-slate-800 dark:text-slate-100">Penjualan Terbaru</h2>
                 </div>
                 {dash.latestSales && (
@@ -408,7 +408,7 @@ export function DashboardPage() {
               </div>
 
               {!dash.latestSales ? (
-                <div className="p-8 text-center text-xs font-medium text-slate-500 dark:text-slate-400 bg-slate-50/30 dark:bg-slate-850/30 flex items-center justify-center gap-1.5">
+                <div className="p-8 text-center text-xs font-medium text-slate-500 dark:text-slate-400 bg-slate-50/50 dark:bg-slate-800/40 flex items-center justify-center gap-1.5">
                   <Lock className="h-3.5 w-3.5 text-slate-400" />
                   Data rincian penjualan disembunyikan (memerlukan izin Ringkasan Keuangan).
                 </div>
@@ -464,7 +464,7 @@ export function DashboardPage() {
 
                         {/* Collapsible mini table */}
                         {isExpanded && (
-                          <div className="border-t border-slate-100 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-850/80 px-5 py-3 text-xs">
+                          <div className="border-t border-slate-100 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-800/70 px-5 py-3 text-xs">
                             <p className="text-slate-500 dark:text-slate-400 text-[11px] mb-2 font-medium">
                               Rincian Transaksi Faktur {sale.invoiceNumber}:
                             </p>
@@ -499,15 +499,15 @@ export function DashboardPage() {
               onClose={() => setSelectedInvoice(null)}
             >
               <div className="space-y-4 text-xs">
-                <div className="grid grid-cols-2 gap-2 bg-slate-50 dark:bg-slate-850 p-3 rounded-lg border border-slate-200 dark:border-slate-800">
+                <div className="grid grid-cols-2 gap-2 bg-slate-50 dark:bg-slate-800/80 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
                   <div>
-                    <span className="text-slate-400 block text-[11px]">Waktu Transaksi</span>
+                    <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Waktu Transaksi</span>
                     <span className="font-semibold text-slate-800 dark:text-slate-200">
                       {formatDateTime(selectedInvoice.createdAt)}
                     </span>
                   </div>
                   <div>
-                    <span className="text-slate-400 block text-[11px]">Total Belanja</span>
+                    <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Total Belanja</span>
                     <span className="font-bold font-mono text-emerald-700 dark:text-emerald-400 text-sm">
                       {formatRupiah(selectedInvoice.total)}
                     </span>

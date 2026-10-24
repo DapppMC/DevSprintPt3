@@ -609,7 +609,7 @@ export function PurchaseOrdersPage() {
             className={`rounded-lg px-3 py-1.5 text-xs font-bold transition-transform duration-100 ease-out cursor-pointer ${
               filterStatus === tab.id
                 ? 'bg-emerald-600 text-white shadow-xs'
-                : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-750 border border-slate-200 dark:border-slate-700'
+                : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700'
             }`}
           >
             {tab.label}

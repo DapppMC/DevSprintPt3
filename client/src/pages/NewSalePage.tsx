@@ -278,9 +278,9 @@ export function NewSalePage() {
           <div className="lg:col-span-5 space-y-4">
             <section className={`${cardClass} overflow-hidden flex flex-col`}>
               {/* Cart Header */}
-              <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 px-5 py-3.5 bg-slate-50/50 dark:bg-slate-850">
+              <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 px-5 py-3.5 bg-slate-50/70 dark:bg-slate-800/80">
                 <div className="flex items-center gap-2">
-                  <ShoppingCart className="h-4 w-4 text-emerald-600" />
+                  <ShoppingCart className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                   <h2 className="font-bold text-sm text-slate-900 dark:text-slate-100">
                     Keranjang Belanja ({rows.length})
                   </h2>
@@ -348,13 +348,13 @@ export function NewSalePage() {
               </div>
 
               {/* Payment & Cash Calculator Section */}
-              <div className="border-t border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-850/60 p-4 space-y-3">
+              <div className="border-t border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/95 p-4 space-y-3">
                 {/* Total Billing */}
                 <div className="flex items-baseline justify-between">
-                  <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
                     Total Tagihan
                   </span>
-                  <span className="text-2xl font-black text-slate-900 dark:text-slate-100 font-mono tabular-nums text-emerald-700 dark:text-emerald-400">
+                  <span className="text-2xl font-black font-mono tabular-nums text-emerald-700 dark:text-emerald-400">
                     {formatRupiah(total)}
                   </span>
                 </div>
