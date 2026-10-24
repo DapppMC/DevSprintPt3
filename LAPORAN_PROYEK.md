@@ -10,7 +10,7 @@
 
 | Pembaca | Bagian yang dibaca |
 | --- | --- |
-| Atasan | 1, 2, 3, 7, 8 |
+| Peninjau Proyek | 1, 2, 3, 7, 8 |
 | Tim non-teknis | 1 sampai 4, dan 9 |
 | Developer | Semua bagian |
 
@@ -30,7 +30,7 @@ Solusinya dua modul:
 
 **Status akhir:** 20 dari 20 skenario uji lulus (`FINAL_TEST.md`). Dari 12 permintaan Cak Rofi, 11 selesai dan 1 sebagian (barang rusak dan klaim ke sales).
 
-**Tiga hal yang perlu diketahui atasan:**
+**Tiga hal utama yang perlu diketahui peninjau proyek:**
 1. Semua aturan bisnis memakai nilai usulan tim. Pertanyaan ke Cak Rofi belum dijawab, jadi belum ada yang dikonfirmasi klien.
 2. Di layar, barang ditolak dan bonus baru bisa dicatat dalam dus utuh. Mencatat "2 bungkus penyok" baru bisa lewat API (jalur teknis di belakang layar).
 3. Penerimaan yang sudah tersimpan tidak bisa diubah atau dibatalkan, dan pemilihan penerima belum memakai login.
@@ -380,11 +380,11 @@ Semua pengujian di atas otomatis. Tampilan layar **tidak punya test otomatis**. 
 
 ---
 
-## 8. Batasan, risiko, dan di luar cakupan
+## 8. Bpeninjau proyek, risiko, dan di luar cakupan
 
-**Batasan yang ditemukan saat memeriksa kode**
+**Bpeninjau proyek yang ditemukan saat memeriksa kode**
 
-| No | Batasan | Akibat bagi klien |
+| No | Bpeninjau proyek | Akibat bagi klien |
 | --- | --- | --- |
 | 1 | **Belum ada konfirmasi klien.** Semua aturan di bagian 6 adalah usulan | Ada kemungkinan aturan perlu disesuaikan setelah bicara dengan Cak Rofi. |
 | 2 | **Barang ditolak dan bonus di layar hanya dalam satuan beli utuh** (isian bertahap 1 dus). API sendiri mendukung per bungkus | Mencatat "2 bungkus penyok dalam 1 dus" belum bisa dari layar. Ini sebabnya permintaan 9 berstatus Sebagian. |
@@ -525,7 +525,7 @@ Pada Sesi 3 ini, sistem telah diperkuat dengan **pintu keamanan berlapis**:
 | **Privasi Omset Penjualan** | Omset harian terpampang di Dashboard dan riwayat penjualan bisa dibuka bebas. | **Terkunci khusus Pemilik**: Staf hanya melihat jumlah stok barang dan peringatan stok menipis. |
 | **Wewenang Mengubah Master Data** | Siapa saja bisa menambah supplier, menghapus barang, atau mengubah harga. | **Khusus Pemilik**: Staf yang mencoba mengubah data master ditolak seketika (*403 Forbidden*). |
 | **Kejujuran Penerima Barang** | Staf bebas memilih nama siapa saja yang menerima barang di dropdown form. | **Anti-Pencatutan Nama**: Sistem mengunci penerima sesuai akun yang login. Nama staf lain tidak bisa dicatut. |
-| **Serangan Tebak PIN (Brute-Force)** | Tidak ada pembatasan. | Sistem membatasi maksimal 5 kesalahan PIN, setelah itu akun dibekukan sementara selama 15 menit. |
+| **Serangan Tebak PIN (Brute-Force)** | Tidak ada pembpeninjau proyek. | Sistem membatasi maksimal 5 kesalahan PIN, setelah itu akun dibekukan sementara selama 15 menit. |
 | **Pengaturan Hak Akses** | Statis dan tidak ada kendali peran. | **Role Permission Manager**: Pemilik dapat mengaktifkan/menonaktifkan hak akses Staf dengan satu centangan di layar. |
 
 ---
@@ -982,7 +982,7 @@ Seluruh uji otomatis dijalankan menggunakan Vitest Runner dengan database teriso
 
 ### 17.7 Panduan Demo (5 Menit)
 
-Berikut langkah demi langkah untuk mendemonstrasikan keunggulan arsitektur Fase 1 kepada atasan atau pemilik warung:
+Berikut langkah demi langkah untuk mendemonstrasikan keunggulan arsitektur Fase 1 kepada pemangku kepentingan atau pemilik warung:
 
 1. **Buka Aplikasi**: Akses `http://localhost:8100/` pada peramban web.
 2. **Login Sebagai Pemilik (Cak Rofi)**:
@@ -1027,7 +1027,7 @@ Berikut langkah demi langkah untuk mendemonstrasikan keunggulan arsitektur Fase 
 ## 18. BAB 18: SWARM PRO FASE 2 — LAPORAN EKSEKUTIF LEAD FRONTEND ARCHITECT & UI/UX
 
 **Penulis:** Worker 3 / Lead Frontend & UI/UX Architect (`sololevelingkakaopage01@gmail.com`)  
-**Target Pembaca:** Pemilik Warung (Cak Rofi), Pengembang (Vibe Coder), Atasan/Manager, dan Stakeholder Eksekutif  
+**Target Pembaca:** Pemilik Warung (Cak Rofi), Pengembang (Vibe Coder), Manager / Peninjau Proyek, dan Stakeholder Eksekutif  
 **Status Implementasi:** 🏆 **100% Selesai & Terverifikasi (Build Sukses & 62/62 Vitest PASS)**  
 
 ---
@@ -1151,7 +1151,7 @@ flowchart TD
 
 ### 18.7 Panduan Demo Antarmuka Eksekutif (5 Menit)
 
-Gunakan panduan berikut untuk mempresentasikan fitur antarmuka kepada atasan atau pemilik toko:
+Gunakan panduan berikut untuk mempresentasikan fitur antarmuka kepada pemangku kepentingan atau pemilik toko:
 
 1. **Langkah 1 — Akses Aplikasi & Halaman Login Modern**:
    - Buka browser dan buka alamat aplikasi: `http://localhost:3200/` (atau port dev yang aktif).
@@ -1200,7 +1200,7 @@ Gunakan panduan berikut untuk mempresentasikan fitur antarmuka kepada atasan ata
 ## 19. BAB 19: SWARM PRO FASE 3 — LAPORAN PENJAMINAN MUTU, UJI KETAHANAN ACID & MATRIKS KEAMANAN (95/95 PASS 100% HIJAU)
 
 **Penulis:** Worker 4 / QA & Test Harness Architect (`sololevelingkakaopage02@gmail.com`) didukung Worker 2 / Backend Architect (`nanomushinkakaopage@gmail.com`)  
-**Target Pembaca:** Pemilik Toko (Cak Rofi), Pengembang (Vibe Coder), Atasan/Manager, dan Tim Audit Teknis  
+**Target Pembaca:** Pemilik Toko (Cak Rofi), Pengembang (Vibe Coder), Manager / Peninjau Proyek, dan Tim Audit Teknis  
 **Status Pengujian:** 🏆 **95 dari 95 Skenario Uji Lulus 100% (100% Hijau)**  
 
 ---
@@ -1342,7 +1342,7 @@ Hasil yang dijamin: **`Test Files 9 passed (9) | Tests 108 passed (108) | 100% P
 
 ### 20.1 Ringkasan Eksekutif (Bahasa Awam)
 
-Setelah sistem Warung Madura Stock Manager dinyatakan tangguh dan lulus uji transaksional ekstrem dengan 108 pengujian otomatis (100% kelulusan), tahapan berikutnya adalah **Polish & Overhaul**. Tahap ini difokuskan pada peningkatan kelas visual (*corporate aesthetic*), kenyamanan mata pengguna di malam hari (*dark mode*), profesionalisme antarmuka tanpa emoji kartun murahan (*zero-emoji policy*), serta penyiapan data simulasi nyata yang lengkap agar penguji atau atasan (*supervisor*) dapat langsung mengevaluasi seluruh kemungkinan skenario bisnis tanpa perlu mengetik data manual dari awal.
+Setelah sistem Warung Madura Stock Manager dinyatakan tangguh dan lulus uji transaksional ekstrem dengan 108 pengujian otomatis (100% kelulusan), tahapan berikutnya adalah **Polish & Overhaul**. Tahap ini difokuskan pada peningkatan kelas visual (*corporate aesthetic*), kenyamanan mata pengguna di malam hari (*dark mode*), profesionalisme antarmuka tanpa emoji kartun murahan (*zero-emoji policy*), serta penyiapan data simulasi nyata yang lengkap agar penguji atau peninjau proyek dapat langsung mengevaluasi seluruh kemungkinan skenario bisnis tanpa perlu mengetik data manual dari awal.
 
 Sebagai **Worker 1 (Lead Orchestrator & Master Architect)**, tanggung jawab utama pada Fase 1 ini adalah menetapkan **kontrak baku arsitektur sistem** (`01-contract.md` dan `architecture_spec.json`). Dokumen ini berfungsi seperti "gambar cetak biru insinyur" yang mengunci aturan main antara bagian belakang (*backend*) dan bagian depan (*frontend*), sehingga pekerjaan berikutnya oleh Worker 2 (Backend & Seeding) dan Worker 3 (Frontend & Dark Mode) dapat berjalan paralel tanpa terjadi salah paham atau konflik integrasi.
 
@@ -1355,7 +1355,7 @@ Sebagai **Worker 1 (Lead Orchestrator & Master Architect)**, tanggung jawab utam
 | **Identitas Logo Toko** | Menggunakan kotak inisial teks generik `WM` berwarna hijau. | Mengadopsi foto gerai fisik Warung Madura asli (`warung-madura-logo.jpg`) beresolusi tajam dengan proporsi persegi dinamis. |
 | **Kenyamanan Tampilan (Tema)** | Hanya tersedia Light Mode (putih terang), membuat mata lelah saat kasir bekerja giliran malam (*shift 24 jam*). | Kontrak High-Contrast Dark Mode baku dengan standar WCAG AA/AAA, lengkap dengan tombol saklar (*Theme Toggle*) berikon Matahari/Bulan. |
 | **Kualitas Ikon Antarmuka** | Menggunakan emoji unicode bawaan OS (`👑`, `👤`, `📦`, `🛒`, dsb.) yang tampil berbeda-beda di HP/laptop dan terkesan murahan (*AI slop*). | Kebijakan Zero-Emoji Baku: 100% diganti dengan ikon vektor presisi (SVG) dari pustaka profesional `lucide-react`. |
-| **Data Contoh untuk Evaluasi Atasan** | Data Purchase Order dan Penerimaan Barang masih kosong di seed awal; atasan harus membuat data satu-persatu untuk menguji. | Spesifikasi Seeding Komprehensif: Otomatis memuat seluruh status PO (`OPEN`, `PARTIAL`, `COMPLETE`, `CANCELLED`) dan seluruh varian penerimaan barang (Normal, Bonus, Rusak). |
+| **Data Contoh untuk Evaluasi Sistem** | Data Purchase Order dan Penerimaan Barang masih kosong di seed awal; peninjau proyek harus membuat data satu-persatu untuk menguji. | Spesifikasi Seeding Komprehensif: Otomatis memuat seluruh status PO (`OPEN`, `PARTIAL`, `COMPLETE`, `CANCELLED`) dan seluruh varian penerimaan barang (Normal, Bonus, Rusak). |
 | **Standar Kelulusan Kode** | 108/108 tes lulus, namun belum ada kontrak visual yang baku. | 108/108 tes Vitest tetap lulus 100% (Zero Regression) + Kontrak Arsitektur terkunci baku di `01-contract.md` & `architecture_spec.json`. |
 
 ---
@@ -1367,7 +1367,7 @@ Sebagai **Worker 1 (Lead Orchestrator & Master Architect)**, tanggung jawab utam
 | **1. Ganti Logo WM dengan Foto Warung Madura Asli** | Menetapkan URI asset `/warung-madura-logo.jpg`, letak public folder, tata letak sidebar (44x44px), login page (80x80px), dan modal slip cetak. | `01-contract.md` Bab 2.1 | ✅ **LOCKED & APPROVED** |
 | **2. Mode Gelap Kontras Tinggi & Saklar Tema** | Menetapkan arsitektur Tailwind v4 `@custom-variant dark`, state machine di `ThemeContext`, token palet kontras tinggi (Slate-950/Slate-100), dan toggle switch di sidebar. | `01-contract.md` Bab 2.2 | ✅ **LOCKED & APPROVED** |
 | **3. Hapus Seluruh Emoji (Ganti Lucide SVG murni)** | Menetapkan tabel pemetaan 1-ke-1 penggantian seluruh emoji unicode dengan komponen SVG resmi dari `lucide-react` tanpa sisa. | `01-contract.md` Bab 2.3 | ✅ **LOCKED & APPROVED** |
-| **4. Seeding Data Komprehensif untuk Evaluasi Atasan** | Merancang skenario data simulasi PO (4 status: OPEN, PARTIAL, COMPLETE, CANCELLED), GR (Normal, Bonus, Reject), mutasi stok, dan riwayat penjualan. | `01-contract.md` Bab 2.4 | ✅ **LOCKED & APPROVED** |
+| **4. Seeding Data Komprehensif untuk Evaluasi Sistem** | Merancang skenario data simulasi PO (4 status: OPEN, PARTIAL, COMPLETE, CANCELLED), GR (Normal, Bonus, Reject), mutasi stok, dan riwayat penjualan. | `01-contract.md` Bab 2.4 | ✅ **LOCKED & APPROVED** |
 | **5. Jaga Pass-Rate Vitest 100% (Zero Regression)** | Memverifikasi seluruh 108 pengujian otomatis dari 9 modul tetap berjalan hijau sempurna tanpa satupun yang gagal. | `01-contract.md` Bab 5 | ✅ **100% PASS (108/108)** |
 
 ---
@@ -1424,7 +1424,7 @@ stateDiagram-v2
    - Menambahkan petunjuk baku logo Warung Madura asli.
    - Menambahkan tabel token warna mode gelap kontras tinggi (*High Contrast Dark Palette*).
    - Menambahkan matriks pemetaan ikon Lucide SVG pengganti emoji secara tuntas.
-   - Menambahkan skenario data dummy untuk evaluasi atasan (4 status PO dan 3 varian GR).
+   - Menambahkan skenario data dummy untuk evaluasi sistem (4 status PO dan 3 varian GR).
    - Mempertahankan seluruh spesifikasi skema 3NF relasional dan kontrak API DTO yang sudah ada.
 2. **`architecture_spec.json` (Diperbarui ke Versi 2.1.0)**:
    - Format JSON terstruktur yang memuat seluruh direktif: `brandLogo`, `darkMode`, `iconography`, `seedingMatrix`, serta daftar API endpoint dan matriks verifikasi.
@@ -1446,7 +1446,7 @@ Semua aturan bisnis (konversi satuan, penguncian stok non-negatif, transaksi ato
 
 ---
 
-### 20.7 Panduan Demo (5 Menit) untuk Atasan / Supervisor
+### 20.7 Panduan Demo (5 Menit) untuk Peninjau Proyek / Evaluator
 
 Untuk memeriksa hasil kerja Fase 1 Arsitektur Sistem Baku:
 1. **Buka File Kontrak Sistem**: Buka berkas [01-contract.md](file:///mnt/windows/Users/lenovo/Downloads/DevSprint-main/DevSprint-main/warung-madura-stock-manager/01-contract.md) di editor untuk melihat spesifikasi lengkap aturan bisnis, API, dan skema database 3NF.
@@ -1492,7 +1492,7 @@ Seluruh 108 pengujian otomatis yang mencakup logika bisnis, transaksi database A
 | **Standar Ikonografi** | Menggunakan emoji sistem operasi (`👑`, `👤`, `📦`, `🛒`, dll.) yang bentuknya berantakan di HP/PC berbeda. | 100% Ikon Vektor Presisi (*Lucide React SVG*), seragam di seluruh browser dan perangkat. |
 | **Kelengkapan Data Uji Supervisor** | Data contoh minim, status pesanan dan penerimaan belum mencakup kasus khusus. | Dataset komprehensif: 4 status PO lengkap (`OPEN`, `PARTIAL`, `COMPLETE`, `CANCELLED`), 3 variasi GR (normal, bonus, penyok), 48 mutasi stok terhubung. |
 | **Integritas Transaksi Kasir** | Potensi kesalahan catat jika koneksi terputus di tengah jalan. | Proteksi ACID Database: Transaksi gagal otomatis dibatalkan 100% (*atomic rollback*), tidak ada data nyangkut. |
-| **Perlindungan Hak Akses (RBAC)** | Pembatasan menu hanya di tampilan antarmuka (UI). | Pengamanan ganda di antarmuka dan backend API: Akses tanpa izin langsung ditolak dengan pesan `403 Terlarang`. |
+| **Perlindungan Hak Akses (RBAC)** | Pembpeninjau proyek menu hanya di tampilan antarmuka (UI). | Pengamanan ganda di antarmuka dan backend API: Akses tanpa izin langsung ditolak dengan pesan `403 Terlarang`. |
 | **Ketahanan Uji Otomatis** | Pengujian dijalankan terpisah-pisah secara manual. | Runner otomatis terpadu satu pintu (`python3 run_all_tests.py`) memverifikasi Typecheck, Linter, dan Test Suite (100% PASS). |
 
 ---
@@ -1641,9 +1641,9 @@ All business logic, database transactions, RBAC controls, and edge cases PASSED.
 
 ---
 
-### 21.7 Panduan Demo (5 Menit) untuk Atasan / Supervisor
+### 21.7 Panduan Demo (5 Menit) untuk Peninjau Proyek / Evaluator
 
-Untuk membuktikan keandalan sistem kepada atasan atau supervisor evaluasi, ikuti langkah demonstrasi cepat berikut:
+Untuk membuktikan keandalan sistem kepada evaluator atau peninjau sistem evaluasi, ikuti langkah demonstrasi cepat berikut:
 
 1. **Jalankan Uji Otomatis Satu Pintu**:
    Buka terminal di root workspace dan ketik:
@@ -1688,7 +1688,7 @@ Untuk membuktikan keandalan sistem kepada atasan atau supervisor evaluasi, ikuti
 
 ## 21. Laporan Swarm Pro Polish & Overhaul Tuntas: Dark Mode, Zero-Emoji, Seeding Dataset & Sertifikasi QA 100% PASS
 
-**Target Pembaca:** Vibe Coder, Atasan / Manager, dan Supervisor Evaluasi DevSprint.  
+**Target Pembaca:** Vibe Coder, Manager / Peninjau Proyek, dan Supervisor Evaluasi DevSprint.  
 **Tujuan Dokumen:** Memberikan laporan komprehensif tanpa jargon rumit mengenai penyempurnaan menyeluruh (*final polish and overhaul*) aplikasi Warung Madura Stock Manager, mencakup integrasi identitas toko asli, mode gelap berstandar tinggi, antarmuka bersih tanpa emoji, dataset contoh menyeluruh untuk uji supervisor, serta pembuktian kelulusan 100% uji otomatis.
 
 ---
@@ -1938,6 +1938,184 @@ flowchart TD
 - **108 dari 108 Skenario Pengujian Lolos 100% (Vitest PASS)**.
 - **TypeScript Strict Compilation 0 Error** (`tsc -p tsconfig.build.json` & `tsc --noEmit`).
 - **Production Asset Build Sukses** (`vite build` menghasilkan aset bundle yang ringkas dan teroptimasi).
+
+---
+
+## 23. LAPORAN AKTIVASI WINDOWS LOCALHOST & SINKRONISASI DATABASE TERBARU
+
+### 23.1 Ringkasan Eksekutif (Bahasa Awam)
+Sebelumnya, sistem Warung Madura telah dikembangkan dengan fitur-fitur mutakhir (seperti Direktori Hub Grosir, Scraper Komoditas, Chat Real-Time dua arah, Mode Gelap, dan Analitik Visual) di lingkungan Linux/Cloud Run. Namun, ketika hendak dijalankan di laptop Windows, aplikasi mengalami kendala sehingga terkesan masih berupa "versi lama" atau tidak dapat dibuka.
+
+**Mengapa hal tersebut terjadi?**
+1. **Folder Bersarang**: Hasil unduhan berkas zip di Windows mengekstrak folder menjadi bertingkat dua (`DevSprint-main/DevSprint-main`). Akibatnya, perintah untuk menyalakan aplikasi di Windows mencari berkas di tempat yang salah.
+2. **Kunci Konfigurasi `.env` Belum Ada**: Karena berkas rahasia `.env` memang sengaja tidak diunggah ke internet demi keamanan, sistem di Windows belum tahu alamat database PostgreSQL lokalnya.
+3. **Database Windows Tertinggal**: Mesin database PostgreSQL di Windows masih memakai struktur tabel lama (13 tabel), belum mengenal tabel grosir dan percakapan chat baru.
+4. **Alat Bantu Windows Belum Terpasang**: Pustaka program yang diunduh di Linux tidak menyediakan skrip perintah khusus sistem operasi Windows (`.cmd`).
+
+Kini, seluruh kendala tersebut telah dituntaskan 100%. Struktur folder telah dirapikan, database lokal telah disinkronkan menjadi 19 tabel lengkap, data master warung realistis telah ditanam, dan aplikasi kini dapat dijalankan secara langsung di komputer Windows Anda baik untuk mode pengembangan (*development*) maupun mode siap saji (*production*).
+
+---
+
+### 23.2 Tabel Perbandingan Sebelum vs. Sesudah (Windows Localhost)
+
+| Aspek / Komponen | Sebelum Pembenahan | Sesudah Pembenahan (Status Sekarang) |
+| :--- | :--- | :--- |
+| **Lokasi Monorepo** | Tersembunyi di dalam folder ganda `DevSprint-main/DevSprint-main` | Bersih di folder utama `C:\Users\lenovo\Downloads\DevSprint-main` |
+| **Kesiapan Eksekusi Windows** | Error `ENOENT` saat menjalankan `npm run dev` | Berjalan lancar via `npm run dev` maupun `npm start` |
+| **Konfigurasi Lingkungan (`.env`)** | Kosong / tidak ada file `.env` di Windows | Dibuat otomatis mengarah ke PostgreSQL 17 lokal (`warung_madura`) |
+| **Skema Database Lokal** | Versi lama (13 tabel, tanpa fitur Hub Grosir & Chat) | Versi termutakhir (19 tabel sinkron penuh dengan Prisma ORM) |
+| **Data Uji Warung Madura** | Kosong atau parsial | Tersemai lengkap (15 komoditas, 5 PO, 4 GR, 8 Faktur Penjualan, 48 Log Mutasi Stok, 6 Mitra Grosir) |
+| **Hasil Uji Otomatis** | Tidak dapat dijalankan | **108 dari 108 Pengujian Lolos (100% PASS)** |
+| **Akses di Web Browser** | Tidak bisa diakses di Windows | Dapat diakses langsung di `http://localhost:5001` atau `http://localhost:5173` |
+
+---
+
+### 23.3 Diagram Alur Menjalankan di Windows Localhost
+
+```mermaid
+flowchart LR
+    A["Buka Terminal di Folder Proyek"] --> B{"Pilih Mode Eksekusi"}
+    B -- "Mode Cepat / Produksi" --> C["Jalankan: npm start"]
+    B -- "Mode Pengembangan (HMR)" --> D["Jalankan: npm run dev"]
+    C --> E["Buka Browser:<br>http://localhost:5001"]
+    D --> F["Buka Browser:<br>http://localhost:5173"]
+    E --> G[("Database PostgreSQL 17 Lokal<br>warung_madura (Port 5432)")]
+    F --> G
+```
+
+---
+
+### 23.4 Panduan Praktis Menjalankan di Windows (Langkah Demi Langkah)
+
+#### Cara 1: Menjalankan Mode Siap Pakai (Rekomendasi untuk Uji Coba)
+1. Buka PowerShell atau Command Prompt di folder proyek:
+   ```powershell
+   cd C:\Users\lenovo\Downloads\DevSprint-main
+   ```
+2. Jalankan perintah:
+   ```powershell
+   npm start
+   ```
+3. Buka peramban (Chrome / Edge / Firefox) dan masuk ke:
+   ```
+   http://localhost:5001
+   ```
+4. Masuk (*login*) menggunakan kredensial bawaan:
+   - **Pemilik (Cak Rofi)**: PIN `123456`
+   - **Staf Kasir (Udin)**: PIN `1111`
+   - **Staf Kasir (Sari)**: PIN `2222`
+
+#### Cara 2: Menjalankan Mode Pengembangan (*Development Live Reload*)
+1. Buka PowerShell di folder proyek:
+   ```powershell
+   cd C:\Users\lenovo\Downloads\DevSprint-main
+   npm run dev
+   ```
+2. Buka peramban pada alamat:
+   ```
+   http://localhost:5173
+   ```
+   *(Setiap perubahan kode visual atau backend akan langsung ter-update otomatis tanpa perlu refresh).*
+
+---
+
+## 24. Laporan Transformasi: Planner System 3.0 & Multi-Agent Pro Overhaul
+
+### 24.1 Ringkasan Eksekutif (Bahasa Awam)
+Melalui penerapan **AI Planner System 3.0** dan metodologi **Multi-Agent Pro Enterprise SDLC**, dashboard operasional Warung Madura "Berkah 24 Jam" telah ditransformasikan secara menyeluruh. Dari aplikasi inventaris standar menjadi **Executive Operations Command Center** berstandar korporat modern.
+
+Peningkatan utama difokuskan pada:
+1. **Kecepatan Kasir (Sat-Set)**: Halaman kasir baru memungkinkan pencarian cepat barang, scan barcode, filter kategori sekali klik, kalkulator uang tunai otomatis, dan cetak struk termal ala kasir modern.
+2. **Kecerdasan Finansial**: Cak Rofi kini dapat melihat estimasi laba kotor harian (Gross Profit) yang dihitung otomatis dari selisih omzet dan harga modal kulakan, lengkap dengan persentase margin keuntungan.
+3. **Peringatan & Saran Kulakan Otomatis**: Sistem mendeteksi barang yang hampir habis dan langsung memberikan saran berapa dus/renteng yang harus dipesan ke distributor grosir.
+4. **Navigasi Secepat Kilat (`Ctrl+K`)**: Menekan tombol kombinasi `Ctrl+K` membuka Command Palette untuk berpindah halaman atau mencari produk seketika tanpa menyentuh mouse.
+5. **Estetika & Kenyamanan Visual**: Mengikuti pedoman *Design Constitution* (Zero AI Color Clichés, font angka tabular yang rapi, transisi kinetik yang halus, dan kontras warna yang nyaman di mata baik siang maupun malam).
+
+---
+
+### 24.2 Sebelum vs Sesudah (Before vs After)
+
+| Fitur / Aspek | Sebelum Transformasi 3.0 | Sesudah Transformasi Planner 3.0 |
+| --- | --- | --- |
+| **Antarmuka Kasir** | Form dropdown biasa yang lambat jika produk banyak | **Kasir Express POS**: Search barcode/SKU, kategori pills, kartu komoditas 1-klik |
+| **Perhitungan Uang Pembeli** | Dihitung manual di kalkulator fisik | **Kalkulator Cepat**: Tombol uang pas, +10rb, +20rb, +50rb, +100rb, status kembalian otomatis |
+| **Bukti Transaksi Pembeli** | Tidak ada struk fisik | **Struk Termal Otomatis**: Format 58mm/80mm khas warung Madura siap cetak / unduh TXT |
+| **Analisis Keuntungan** | Hanya menampilkan omzet kotor | **Estimasi Laba Kotor**: Menampilkan nominal laba bersih dan % margin laba harian |
+| **Produk Terlaris** | Tidak ada perankingan komoditas | **Leaderboard Top 5 Produk**: Peringkat 1-5 produk paling laku beserta kontribusi omzet |
+| **Perencanaan Kulakan** | Menebak-nebak barang apa yang harus dibeli | **Smart Reorder Proposal**: Saran otomatis jumlah dus/renteng yang perlu dipesan ke distributor |
+| **Navigasi Global** | Harus klik menu di sidebar satu per satu | **Global Command Palette (`Ctrl+K`)**: Modal pencarian instan seluruh aksi & katalog barang |
+| **Kualitas Animasi & Desain** | Menggunakan `transition-all` yang berat di browser | **Kinetic Hardware-Accelerated**: 9/9 lulus audit desain ketat `design_lint.py` |
+
+---
+
+### 24.3 Diagram Alur Bisnis Baru (Mermaid)
+
+```mermaid
+flowchart TD
+    subgraph KASIR["1. Transaksi Kasir Express & Cetak Struk"]
+        A["Pembeli Datang"] --> B["Buka Kasir Express (F2 / Ctrl+K)"]
+        B --> C["Ketik SKU / Barcode / Pilih Kategori"]
+        C --> D["Klik Produk (Masuk Keranjang)"]
+        D --> E["Pilih Tombol Uang Tunai / Uang Pas"]
+        E --> F["Sistem Hitung Kembalian Otomatis"]
+        F --> G["Klik 'Bayar & Simpan'"]
+        G --> H["Stok Otomatis Terpotong (ACID Guard)"]
+        H --> I["Muncul Struk Termal Madura (Cetak / Unduh)"]
+    end
+
+    subgraph ANALITIK["2. Otomatisasi Dashboard & Kulakan"]
+        H --> J["Update Omzet & Estimasi Laba Kotor"]
+        H --> K["Update Leaderboard Produk Terlaris"]
+        H --> L{"Apakah Stok <= Ambang Kritis?"}
+        L -- Ya --> M["Muncul Notifikasi Rekomendasi Kulakan"]
+        M --> N["Klik 'Buat PO' (Auto-Fill Dus / Renteng)"]
+        L -- Tidak --> O["Stok Aman di Rak"]
+    end
+```
+
+---
+
+### 24.4 Hasil Uji Mutu & Sertifikasi Kualitas (100% Pass Rate)
+
+| Pengujian Sistem | Target Standar | Hasil Aktual | Status |
+| --- | --- | --- | --- |
+| **TypeScript Strict Compiler** | 0 Type Error (Server & Client) | 0 Error | ✅ PASS |
+| **ESLint Quality Checker** | 0 Linter Error | 0 Error | ✅ PASS |
+| **Design Linter (`design_lint.py`)** | 9/9 Aturan Desain (R01-R09) | 9/9 Rules PASS | ✅ PASS |
+| **Vitest Automated Test Suite** | 108 Pengujian Menyeluruh | 108 / 108 Lulus | ✅ PASS |
+| **ACID Concurrency Safety** | Stok tidak boleh minus saat race condition | Terkunci via `updateMany` | ✅ PASS |
+| **Idempotency Protection** | Klik ganda form tidak membuat data dobel | Unique `idempotencyKey` | ✅ PASS |
+| **Localhost Server Daemon** | Port 5001 responsif | HTTP 200 OK & Socket.IO Aktif | ✅ PASS |
+
+---
+
+### 24.5 Panduan Demo 5 Menit (Langkah Demi Langkah untuk Pengguna / Evaluator)
+
+1. **Membuka Dashboard Utama**:
+   - Buka peramban dan kunjungi: `http://localhost:5001`.
+   - Masuk sebagai **Cak Rofi** (PIN: `123456`).
+   - Perhatikan kartu metrik eksekutif baru: **Estimasi Laba Kotor** lengkap dengan persentase margin keuntungan, grafik tren 7 hari, dan leaderboard **Produk Terlaris**.
+2. **Melihat Rekomendasi Kulakan Cerdas**:
+   - Di bagian atas dashboard, perhatikan kotak berwarna kuning keemasan bertuliskan **Rekomendasi Kulakan Cerdas**.
+   - Sistem mendeteksi produk yang hampir habis dan langsung memberikan saran berapa Dus atau Renteng yang perlu dipesan.
+3. **Mencoba Global Command Palette (`Ctrl+K`)**:
+   - Tekan tombol `Ctrl+K` (atau `Cmd+K` di Mac) di keyboard Anda, atau klik tombol cari di header atas.
+   - Ketikkan "Kasir" atau ketik nama komoditas seperti "Indomie".
+   - Perhatikan navigasi instan dan pencarian barang tanpa perlu membuka menu sidebar.
+4. **Mencoba Kasir Express POS**:
+   - Masuk ke menu **Kasir Express** (atau tekan tombol pintas `F2`).
+   - Pilih tab kategori (misal: "Minuman" atau "Makanan Instan").
+   - Klik salah satu produk untuk menambahkan ke keranjang.
+   - Pada kolom pembayaran, klik tombol **Uang Pas** atau **+50rb**.
+   - Lihat bagaimana uang kembalian langsung terhitung secara otomatis dengan warna hijau.
+5. **Mencetak Struk Termal**:
+   - Klik tombol **Bayar & Simpan**.
+   - Dialog **Struk Termal Warung Madura "Berkah 24 Jam"** akan langsung muncul.
+   - Anda dapat menekan **Cetak Struk** untuk mencetak struk kertas, atau **Unduh TXT** untuk menyimpan salinan nota.
+6. **Beralih Antar Akun (Shift Kasir)**:
+   - Di sidebar kiri bawah, klik tombol **Udin** (Kasir Pagi) atau **Sari** (Kasir Malam) untuk melihat bagaimana wewenang keuangan otomatis disembunyikan untuk staf demi menjaga privasi omzet pemilik warung.
+
+
 
 
 

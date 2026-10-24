@@ -31,7 +31,7 @@ const productSeeds: ProductSeed[] = [
   { sku: 'MNM-001', name: 'Aqua 600 ml', category: 'Minuman', purchasePrice: 2300, sellingPrice: 3000, initialStock: 24, baseUnit: 'botol', purchaseUnit: 'dus', unitsPerPurchaseUnit: 24 },
   { sku: 'MNM-002', name: 'Teh Botol Sosro 450ml', category: 'Minuman', purchasePrice: 3800, sellingPrice: 5000, initialStock: 12, baseUnit: 'botol', purchaseUnit: 'dus', unitsPerPurchaseUnit: 24 },
   { sku: 'MNM-003', name: 'Kopi Kapal Api Sachet', category: 'Minuman', purchasePrice: 1100, sellingPrice: 1500, initialStock: 20, baseUnit: 'sachet', purchaseUnit: 'renteng', unitsPerPurchaseUnit: 10 },
-  { sku: 'SMB-001', name: 'Minyak Goreng Bimoli 1L', category: 'Sembako', purchasePrice: 17500, sellingPrice: 19500, initialStock: 12, baseUnit: 'pcs', purchaseUnit: 'dus', unitsPerPurchaseUnit: 12 },
+  { sku: 'SMB-001', name: 'Minyak Goreng Bimoli 1L', category: 'Sembako', purchasePrice: 17500, sellingPrice: 19500, initialStock: 24, baseUnit: 'pcs', purchaseUnit: 'dus', unitsPerPurchaseUnit: 12 },
   { sku: 'SMB-002', name: 'Gula Pasir Gulaku 1 kg', category: 'Sembako', purchasePrice: 15500, sellingPrice: 17500, initialStock: 8, baseUnit: 'bungkus', purchaseUnit: 'bal', unitsPerPurchaseUnit: 20 },
   { sku: 'SMB-003', name: 'Beras Rojolele Super 5 kg', category: 'Sembako', purchasePrice: 62000, sellingPrice: 68000, initialStock: 3, baseUnit: 'karung', purchaseUnit: 'karung', unitsPerPurchaseUnit: 1 },
   { sku: 'SMB-004', name: 'Garam Dapur Cap Kapal 250g', category: 'Sembako', purchasePrice: 2500, sellingPrice: 3500, initialStock: 4, baseUnit: 'pcs', purchaseUnit: 'pak', unitsPerPurchaseUnit: 10 },

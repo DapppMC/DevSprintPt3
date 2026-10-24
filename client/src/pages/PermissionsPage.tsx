@@ -156,11 +156,11 @@ export function PermissionsPage() {
       />
 
       {!isOwner && (
-        <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-xs text-amber-800 flex items-center gap-3 shadow-xs">
-          <AlertTriangle className="h-5 w-5 text-amber-600 shrink-0" />
+        <div className="rounded-xl border border-amber-200 dark:border-amber-800/80 bg-amber-50 dark:bg-amber-950/40 p-4 text-xs text-amber-800 dark:text-amber-200 flex items-center gap-3 shadow-xs">
+          <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0" />
           <div>
             <p className="font-bold">Mode Tinjau Akses (Read-Only)</p>
-            <p className="text-amber-700 mt-0.5">
+            <p className="text-amber-700 dark:text-amber-300 mt-0.5">
               Anda masuk sebagai Staf. Matriks hak akses hanya dapat diubah dan disimpan oleh Pemilik Toko (Role: PEMILIK).
             </p>
           </div>
@@ -168,22 +168,22 @@ export function PermissionsPage() {
       )}
 
       {successMessage && (
-        <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-xs font-bold text-emerald-800 flex items-center gap-2 shadow-xs">
-          <Check className="h-4 w-4 text-emerald-600" />
+        <div className="rounded-xl border border-emerald-200 dark:border-emerald-800/80 bg-emerald-50 dark:bg-emerald-950/40 p-4 text-xs font-bold text-emerald-800 dark:text-emerald-200 flex items-center gap-2 shadow-xs">
+          <Check className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
           <span>{successMessage}</span>
         </div>
       )}
 
       {error && (
-        <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-xs text-rose-800 flex items-center gap-2 shadow-xs">
-          <AlertTriangle className="h-4 w-4 text-rose-600" />
+        <div className="rounded-xl border border-rose-200 dark:border-rose-800/80 bg-rose-50 dark:bg-rose-950/40 p-4 text-xs text-rose-800 dark:text-rose-200 flex items-center gap-2 shadow-xs">
+          <AlertTriangle className="h-4 w-4 text-rose-600 dark:text-rose-400" />
           <span>{error}</span>
         </div>
       )}
 
       {/* Main Matrix Table with Sticky Header position: sticky; top: 0; z-index: 20 */}
       <div className={tableContainerClass}>
-        <table className="min-w-full divide-y divide-slate-200 border-separate border-spacing-0">
+        <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-800 border-separate border-spacing-0">
           <thead className={tableHeadClass}>
             <tr>
               <th className={thStickyClass}>Kategori</th>
@@ -201,7 +201,7 @@ export function PermissionsPage() {
               return (
                 <tr
                   key={def.id}
-                  className={`hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors ${
+                  className={`hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-transform duration-100 ease-out ${
                     isCostOrFinancial ? 'bg-amber-50/20 dark:bg-amber-950/20' : ''
                   }`}
                 >
@@ -233,7 +233,7 @@ export function PermissionsPage() {
                     <label className="inline-flex cursor-pointer items-center justify-center">
                       <input
                         type="checkbox"
-                        className="h-5 w-5 rounded-md border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-emerald-600 focus:ring-emerald-500 disabled:cursor-not-allowed disabled:opacity-50 transition-all cursor-pointer"
+                        className="h-5 w-5 rounded-md border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-emerald-600 focus:ring-emerald-500 disabled:cursor-not-allowed disabled:opacity-50 transition-transform duration-100 ease-out cursor-pointer"
                         checked={isStaffAllowed}
                         disabled={!isOwner || isSaving}
                         onChange={() => handleToggleStaff(def.id)}

@@ -169,6 +169,107 @@ async function main() {
       console.log(`[Migration] Database already populated (${count} users found).`);
     }
 
+    // Check if initial Purchase Orders exist
+    try {
+      const poCheck = await client.query(`SELECT COUNT(*) as count FROM "PurchaseOrder";`);
+      if (parseInt(poCheck.rows[0].count, 10) === 0) {
+        console.log('[Migration] No Purchase Orders found. Seeding initial POs and GRs...');
+        // Insert suppliers if not exist
+        await client.query(`
+          INSERT INTO "Supplier" ("id", "name", "phone", "isActive", "createdAt", "updatedAt")
+          VALUES 
+            ('3882048b-3ab8-42f3-affe-b9506589b815', 'Pak Haji', '08123456789', true, NOW(), NOW()),
+            ('4882048b-3ab8-42f3-affe-b9506589b816', 'Toko Grosir Berkah', '08987654321', true, NOW(), NOW()),
+            ('5882048b-3ab8-42f3-affe-b9506589b817', 'PT Indofood Sukses Makmur', '081122334455', true, NOW(), NOW()),
+            ('6882048b-3ab8-42f3-affe-b9506589b818', 'PT Tirta Investama / Danone Aqua', '081199887766', true, NOW(), NOW())
+          ON CONFLICT ("id") DO NOTHING;
+        `);
+
+        // Find product IDs
+        const mieRes = await client.query(`SELECT id FROM "Product" WHERE "sku" = 'MIE-001' LIMIT 1;`);
+        const aquaRes = await client.query(`SELECT id FROM "Product" WHERE "sku" = 'MNM-001' LIMIT 1;`);
+        const minyakRes = await client.query(`SELECT id FROM "Product" WHERE "sku" = 'SMB-001' LIMIT 1;`);
+
+        if (mieRes.rows[0] && aquaRes.rows[0] && minyakRes.rows[0]) {
+          const mieId = mieRes.rows[0].id;
+          const aquaId = aquaRes.rows[0].id;
+          const minyakId = minyakRes.rows[0].id;
+
+          // PO 1: OPEN
+          const po1Id = 'a1111111-1111-1111-1111-111111111111';
+          await client.query(`
+            INSERT INTO "PurchaseOrder" ("id", "orderNumber", "supplierId", "orderedAt", "status", "note", "createdAt", "updatedAt")
+            VALUES ($1, 'PO-202610-001', '5882048b-3ab8-42f3-affe-b9506589b817', NOW(), 'OPEN', 'Restock mingguan mie instan reguler', NOW(), NOW())
+            ON CONFLICT ("orderNumber") DO NOTHING;
+          `, [po1Id]);
+          await client.query(`
+            INSERT INTO "PurchaseOrderLine" ("id", "purchaseOrderId", "productId", "orderedBase", "fulfilledBase", "cancelledBase", "purchaseUnit", "unitsPerPurchaseUnit", "createdAt", "updatedAt")
+            VALUES (gen_random_uuid(), $1, $2, 120, 0, 0, 'dus', 40, NOW(), NOW())
+            ON CONFLICT DO NOTHING;
+          `, [po1Id, mieId]);
+
+          // PO 2: PARTIAL
+          const po2Id = 'b2222222-2222-2222-2222-222222222222';
+          await client.query(`
+            INSERT INTO "PurchaseOrder" ("id", "orderNumber", "supplierId", "orderedAt", "status", "note", "createdAt", "updatedAt")
+            VALUES ($1, 'PO-202610-002', '6882048b-3ab8-42f3-affe-b9506589b818', NOW(), 'PARTIAL', 'Pengadaan air mineral botol 600ml', NOW(), NOW())
+            ON CONFLICT ("orderNumber") DO NOTHING;
+          `, [po2Id]);
+          const pol2Res = await client.query(`
+            INSERT INTO "PurchaseOrderLine" ("id", "purchaseOrderId", "productId", "orderedBase", "fulfilledBase", "cancelledBase", "purchaseUnit", "unitsPerPurchaseUnit", "createdAt", "updatedAt")
+            VALUES (gen_random_uuid(), $1, $2, 96, 48, 0, 'dus', 24, NOW(), NOW())
+            RETURNING id;
+          `, [po2Id, aquaId]);
+          const pol2Id = pol2Res.rows[0]?.id;
+
+          // GR 1 for PO 2
+          const gr1Id = 'c3333333-3333-3333-3333-333333333333';
+          await client.query(`
+            INSERT INTO "GoodsReceipt" ("id", "receiptNumber", "idempotencyKey", "purchaseOrderId", "supplierId", "receivedById", "receivedAt", "note", "createdAt", "updatedAt")
+            VALUES ($1, 'GR-202610-001', 'idemp-gr-init-001', $2, '6882048b-3ab8-42f3-affe-b9506589b818', '1882048b-3ab8-42f3-affe-b9506589b813', NOW(), 'Penerimaan tahap 1 (2 dus Aqua 600ml)', NOW(), NOW())
+            ON CONFLICT ("receiptNumber") DO NOTHING;
+          `, [gr1Id, po2Id]);
+          if (pol2Id) {
+            await client.query(`
+              INSERT INTO "GoodsReceiptLine" ("id", "goodsReceiptId", "productId", "purchaseOrderLineId", "receivedBase", "rejectedBase", "bonusBase", "purchaseUnit", "unitsPerPurchaseUnit", "unitCostPerPurchaseUnit", "costPerBaseUnit", "effectiveCostPerBaseUnit", "createdAt", "updatedAt")
+              VALUES (gen_random_uuid(), $1, $2, $3, 48, 0, 0, 'dus', 24, 55200, 2300, 2300, NOW(), NOW())
+              ON CONFLICT DO NOTHING;
+            `, [gr1Id, aquaId, pol2Id]);
+          }
+
+          // PO 3: COMPLETE
+          const po3Id = 'd4444444-4444-4444-4444-444444444444';
+          await client.query(`
+            INSERT INTO "PurchaseOrder" ("id", "orderNumber", "supplierId", "orderedAt", "status", "note", "createdAt", "updatedAt")
+            VALUES ($1, 'PO-202610-003', '4882048b-3ab8-42f3-affe-b9506589b816', NOW(), 'COMPLETE', 'Pengadaan sembako minyak goreng', NOW(), NOW())
+            ON CONFLICT ("orderNumber") DO NOTHING;
+          `, [po3Id]);
+          await client.query(`
+            INSERT INTO "PurchaseOrderLine" ("id", "purchaseOrderId", "productId", "orderedBase", "fulfilledBase", "cancelledBase", "purchaseUnit", "unitsPerPurchaseUnit", "createdAt", "updatedAt")
+            VALUES (gen_random_uuid(), $1, $2, 24, 24, 0, 'pcs', 1, NOW(), NOW())
+            ON CONFLICT DO NOTHING;
+          `, [po3Id, minyakId]);
+
+          // PO 4: CANCELLED
+          const po4Id = 'e5555555-5555-5555-5555-555555555555';
+          await client.query(`
+            INSERT INTO "PurchaseOrder" ("id", "orderNumber", "supplierId", "orderedAt", "status", "cancelReason", "note", "createdAt", "updatedAt")
+            VALUES ($1, 'PO-202610-004', '3882048b-3ab8-42f3-affe-b9506589b815', NOW(), 'CANCELLED', 'Supplier kehabisan stok varian kopi torabika', 'Pesanan biskuit & kopi', NOW(), NOW())
+            ON CONFLICT ("orderNumber") DO NOTHING;
+          `, [po4Id]);
+          await client.query(`
+            INSERT INTO "PurchaseOrderLine" ("id", "purchaseOrderId", "productId", "orderedBase", "fulfilledBase", "cancelledBase", "purchaseUnit", "unitsPerPurchaseUnit", "createdAt", "updatedAt")
+            VALUES (gen_random_uuid(), $1, $2, 40, 0, 40, 'pcs', 1, NOW(), NOW())
+            ON CONFLICT DO NOTHING;
+          `, [po4Id, mieId]);
+
+          console.log('[Migration] ✓ Initial Purchase Orders and Goods Receipts seeded successfully.');
+        }
+      }
+    } catch (poErr) {
+      console.warn('[Migration] PO seed note:', poErr.message);
+    }
+
     console.log('[Migration] Database migration check completed successfully.');
   } finally {
     await client.end();

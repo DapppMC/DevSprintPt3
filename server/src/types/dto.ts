@@ -192,12 +192,48 @@ export interface GoodsReceiptDetailDto {
   lines: GoodsReceiptLineDto[];
 }
 
+export interface TopProductDto {
+  id: string;
+  name: string;
+  sku: string;
+  category: string;
+  unitsSold: number;
+  revenue: number;
+}
+
+export interface DailySalesTrendDto {
+  date: string;
+  dayName: string;
+  totalRevenue: number;
+  transactionCount: number;
+  unitsSold: number;
+}
+
+export interface ReorderRecommendationDto {
+  productId: string;
+  productName: string;
+  productSku: string;
+  category: string;
+  currentStock: number;
+  lowStockThreshold: number;
+  purchaseUnit: string;
+  unitsPerPurchaseUnit: number;
+  recommendedPurchaseQty: number;
+  estimatedCost: number;
+  supplierName?: string;
+  supplierId?: string;
+}
+
 export interface DashboardDto {
   totalProducts: number;
   totalUnits: number;
   todaySalesTotal: number | null;
+  todayGrossProfit?: number | null;
   lowStockCount: number;
   lowStockThreshold: number;
-  latestSales: SaleSummaryDto[];
+  latestSales: SaleSummaryDto[] | null;
   lowStockProducts: ProductDto[];
+  topProducts?: TopProductDto[];
+  weeklyTrends?: DailySalesTrendDto[];
+  reorderRecommendations?: ReorderRecommendationDto[];
 }

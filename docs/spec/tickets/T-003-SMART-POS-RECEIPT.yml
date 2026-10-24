@@ -1,0 +1,17 @@
+id: T-003-SMART-POS-RECEIPT
+goal: "Penyempurnaan halaman Kasir / POS Baru dengan pencarian barcode instan, kalkulator pecahan uang cepat, perhitungan kembalian, dan modal cetak struk termal Madura"
+frozen:
+  tests/golden/master_baseline.json: a5490e89eb186f100ac4f85a33e2e7510fb1ec1035e4bbf988cdcd2b56e9bf78
+allowed_paths:
+  - client/src/pages/NewSalePage.tsx
+  - client/src/components/ReceiptModal.tsx
+  - client/src/pages/SaleDetailPage.tsx
+forbidden_paths:
+  - server/src/services/goods-receipt.service.ts
+  - tests/golden/**
+protected_tests:
+  - tests/golden/master_baseline.json
+acceptance:
+  - "npm run build -w client"
+stop_if:
+  - "Typecheck client gagal atau build menghasilkan error"

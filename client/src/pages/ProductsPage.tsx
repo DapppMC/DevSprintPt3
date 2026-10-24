@@ -215,7 +215,7 @@ export function ProductsPage() {
                 return (
                   <tr
                     key={product.id}
-                    className={`transition-colors ${
+                    className={`transition-transform duration-100 ease-out ${
                       product.isActive
                         ? 'hover:bg-slate-50/80 dark:hover:bg-slate-800/80'
                         : 'bg-slate-50/40 dark:bg-slate-900/40 text-slate-400 dark:text-slate-500 hover:bg-slate-100/40 dark:hover:bg-slate-800/40'

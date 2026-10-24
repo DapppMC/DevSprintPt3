@@ -20,3 +20,13 @@ yarn-error.log*
 *.log
 .DS_Store
 Thumbs.db
+
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Local Planner & Swarm Scratch
+.planner_manifest.json
+swarm.config.json
+catalog/

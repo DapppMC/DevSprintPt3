@@ -641,7 +641,7 @@ export function ChatWidget() {
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 rounded-full bg-gradient-to-r from-emerald-600 via-teal-700 to-emerald-800 px-4 py-3.5 text-white shadow-2xl hover:scale-105 active:scale-95 transition-all duration-200 border-2 border-white/40 group"
+          className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 rounded-full bg-gradient-to-r from-emerald-600 via-teal-700 to-emerald-800 px-4 py-3.5 text-white shadow-2xl hover:scale-105 active:scale-95 transition-transform duration-100 ease-out duration-200 border-2 border-white/40 group"
           title="Buka Chat & Direktori Supplier Grosir"
         >
           <div className="relative">
@@ -691,14 +691,14 @@ export function ChatWidget() {
             <div className="flex items-center gap-1">
               <button
                 onClick={() => setIsOpen(false)}
-                className="p-1.5 rounded-lg hover:bg-white/15 text-white/80 hover:text-white transition-colors"
+                className="p-1.5 rounded-lg hover:bg-white/15 text-white/80 hover:text-white transition-transform duration-100 ease-out"
                 title="Minimize"
               >
                 <Minimize2 className="h-4 w-4" />
               </button>
               <button
                 onClick={() => setIsOpen(false)}
-                className="p-1.5 rounded-lg hover:bg-white/15 text-white/80 hover:text-white transition-colors"
+                className="p-1.5 rounded-lg hover:bg-white/15 text-white/80 hover:text-white transition-transform duration-100 ease-out"
                 title="Tutup"
               >
                 <X className="h-4 w-4" />
@@ -732,7 +732,7 @@ export function ChatWidget() {
           <div className="flex border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-xs font-semibold shrink-0">
             <button
               onClick={() => setActiveTab('directory')}
-              className={`flex-1 py-2.5 px-3 flex items-center justify-center gap-1.5 transition-colors ${
+              className={`flex-1 py-2.5 px-3 flex items-center justify-center gap-1.5 transition-transform duration-100 ease-out ${
                 activeTab === 'directory'
                   ? 'border-b-2 border-emerald-600 bg-white dark:bg-slate-800 text-emerald-800 dark:text-emerald-300 shadow-2xs'
                   : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
@@ -743,7 +743,7 @@ export function ChatWidget() {
             </button>
             <button
               onClick={() => setActiveTab('chat')}
-              className={`flex-1 py-2.5 px-3 flex items-center justify-center gap-1.5 transition-colors relative ${
+              className={`flex-1 py-2.5 px-3 flex items-center justify-center gap-1.5 transition-transform duration-100 ease-out relative ${
                 activeTab === 'chat'
                   ? 'border-b-2 border-emerald-600 bg-white dark:bg-slate-800 text-emerald-800 dark:text-emerald-300 shadow-2xs'
                   : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
@@ -792,14 +792,14 @@ export function ChatWidget() {
                     <button
                       onClick={handleRunWebSocketScraper}
                       disabled={isScraping}
-                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-700 text-white font-semibold text-xs hover:bg-emerald-800 disabled:opacity-50 transition-colors shadow-xs"
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-700 text-white font-semibold text-xs hover:bg-emerald-800 disabled:opacity-50 transition-transform duration-100 ease-out shadow-xs"
                     >
                       <RefreshCw className={`h-3.5 w-3.5 ${isScraping ? 'animate-spin' : ''}`} />
                       {isScraping ? 'Scraping Live...' : 'Jalankan Scraper'}
                     </button>
                   </div>
 
-                  <p className="text-slate-600 text-[11px] leading-relaxed">
+                  <p className="text-slate-600 dark:text-slate-300 text-[11px] leading-relaxed">
                     Scraping etis berbasis WebSocket, geolokasi presisi dari <strong>Keputih Surabaya</strong>,
                     dan kepatuhan privasi <strong>UU PDP No. 27/2022</strong>.
                   </p>
@@ -807,13 +807,13 @@ export function ChatWidget() {
                   {/* Real-time Progress Bar */}
                   {isScraping && (
                     <div className="mt-2.5 space-y-1.5">
-                      <div className="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
+                      <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2 overflow-hidden">
                         <div
-                          className="bg-gradient-to-r from-emerald-500 to-teal-600 h-2 rounded-full transition-all duration-300"
+                          className="bg-gradient-to-r from-emerald-500 to-teal-600 h-2 rounded-full transition-transform duration-100 ease-out duration-300"
                           style={{ width: `${scrapePercent}%` }}
                         />
                       </div>
-                      <div className="flex items-center justify-between text-[10px] text-emerald-800 font-medium">
+                      <div className="flex items-center justify-between text-[10px] text-emerald-800 dark:text-emerald-300 font-medium">
                         <span className="truncate max-w-[80%]">{scrapeStageMessage}</span>
                         <span>{scrapePercent}%</span>
                       </div>
@@ -821,8 +821,8 @@ export function ChatWidget() {
                   )}
 
                   {!isScraping && scrapeNotice && (
-                    <div className="mt-2 text-[11px] font-medium text-emerald-900 bg-emerald-100/90 rounded-lg px-2.5 py-1.5 flex items-center gap-1.5 border border-emerald-300">
-                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-700 shrink-0" />
+                    <div className="mt-2 text-[11px] font-medium text-emerald-900 dark:text-emerald-200 bg-emerald-100/90 dark:bg-emerald-950/60 rounded-lg px-2.5 py-1.5 flex items-center gap-1.5 border border-emerald-300 dark:border-emerald-800/80">
+                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-700 dark:text-emerald-400 shrink-0" />
                       <span>{scrapeNotice}</span>
                     </div>
                   )}
@@ -831,7 +831,7 @@ export function ChatWidget() {
                 {/* Wholesale Suppliers List */}
                 <div className="space-y-2.5">
                   <div className="flex items-center justify-between px-1">
-                    <span className="text-[11px] font-bold text-slate-600 uppercase tracking-wider">
+                    <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
                       Mitra Grosir di Sekitar ({businesses.length} Ditemukan)
                     </span>
                     <span className="text-[10px] text-slate-400">
@@ -857,7 +857,7 @@ export function ChatWidget() {
                       return (
                         <div
                           key={b.id}
-                          className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3.5 shadow-2xs hover:border-emerald-400 dark:hover:border-emerald-600 hover:shadow-xs transition-all space-y-2"
+                          className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3.5 shadow-2xs hover:border-emerald-400 dark:hover:border-emerald-600 hover:shadow-xs transition-transform duration-100 ease-out space-y-2"
                         >
                           {/* Card Header */}
                           <div className="flex items-start justify-between gap-2">
@@ -940,7 +940,7 @@ export function ChatWidget() {
                               <button
                                 onClick={() => handleToggleContactPhone(b.id)}
                                 disabled={loadingContactId === b.id}
-                                className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-700 hover:text-emerald-800 hover:underline"
+                                className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-700 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 hover:underline"
                               >
                                 {loadingContactId === b.id ? (
                                   <RefreshCw className="h-3 w-3 animate-spin" />
@@ -960,8 +960,8 @@ export function ChatWidget() {
 
                           {/* Revealed Contact Details */}
                           {isContactRevealed && contactData && (
-                            <div className="bg-emerald-50/80 border border-emerald-200 rounded-lg p-2 text-xs flex items-center justify-between animate-in fade-in duration-200">
-                              <div className="flex items-center gap-1.5 text-emerald-900 font-semibold">
+                            <div className="bg-emerald-50/80 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/80 rounded-lg p-2 text-xs flex items-center justify-between animate-in fade-in duration-200">
+                              <div className="flex items-center gap-1.5 text-emerald-900 dark:text-emerald-200 font-semibold">
                                 <Phone className="h-3.5 w-3.5 text-emerald-600" />
                                 <span>{contactData.phone}</span>
                               </div>
@@ -987,7 +987,7 @@ export function ChatWidget() {
                                 href={b.mapsUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex-1 inline-flex items-center justify-center gap-1.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-semibold hover:bg-slate-50 dark:hover:bg-slate-750 transition-colors shadow-2xs"
+                                className="flex-1 inline-flex items-center justify-center gap-1.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-semibold hover:bg-slate-50 dark:hover:bg-slate-750 transition-transform duration-100 ease-out shadow-2xs"
                               >
                                 <Map className="h-3.5 w-3.5 text-slate-500 dark:text-slate-400" />
                                 <span>Maps</span>
@@ -999,7 +999,7 @@ export function ChatWidget() {
                             <button
                               onClick={() => handleStartChatWithBusiness(b)}
                               disabled={isStartingChat === b.id}
-                              className="flex-2 inline-flex items-center justify-center gap-1.5 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-semibold hover:bg-emerald-700 disabled:opacity-50 transition-colors shadow-2xs"
+                              className="flex-2 inline-flex items-center justify-center gap-1.5 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-semibold hover:bg-emerald-700 disabled:opacity-50 transition-transform duration-100 ease-out shadow-2xs"
                             >
                               {isStartingChat === b.id ? (
                                 <RefreshCw className="h-3.5 w-3.5 animate-spin" />
@@ -1024,12 +1024,12 @@ export function ChatWidget() {
                   /* Daftar Percakapan Aktif */
                   <div className="space-y-2">
                     <div className="flex items-center justify-between pb-1">
-                      <p className="text-xs font-bold text-slate-600 uppercase tracking-wider">
+                      <p className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
                         Daftar Percakapan Mitra:
                       </p>
                       <button
                         onClick={fetchConversations}
-                        className="text-[11px] text-emerald-700 hover:underline flex items-center gap-1 font-semibold"
+                        className="text-[11px] text-emerald-700 dark:text-emerald-400 hover:underline flex items-center gap-1 font-semibold"
                       >
                         <RefreshCw className="h-3 w-3" />
                         Refresh
@@ -1050,7 +1050,7 @@ export function ChatWidget() {
                         <div
                           key={c.id}
                           onClick={() => selectConversation(c)}
-                          className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 hover:border-emerald-500 hover:shadow-xs cursor-pointer transition-all space-y-1"
+                          className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 hover:border-emerald-500 hover:shadow-xs cursor-pointer transition-transform duration-100 ease-out space-y-1"
                         >
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
@@ -1171,7 +1171,7 @@ export function ChatWidget() {
                       <button
                         type="submit"
                         disabled={!inputMessage.trim()}
-                        className="p-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-700 text-white hover:from-emerald-700 hover:to-teal-800 disabled:opacity-40 transition-all shadow-xs"
+                        className="p-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-700 text-white hover:from-emerald-700 hover:to-teal-800 disabled:opacity-40 transition-transform duration-100 ease-out shadow-xs"
                         title="Kirim Pesan"
                       >
                         <Send className="h-4 w-4" />

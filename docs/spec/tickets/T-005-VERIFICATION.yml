@@ -1,0 +1,17 @@
+id: T-005-VERIFICATION
+goal: "Verifikasi menyeluruh: typecheck server & client, linter ESLint, linter desain design_lint.py, test suite vitest 108/108 PASS, dan verifikasi localhost"
+frozen:
+  tests/golden/master_baseline.json: a5490e89eb186f100ac4f85a33e2e7510fb1ec1035e4bbf988cdcd2b56e9bf78
+allowed_paths:
+  - run_all_tests.py
+  - progres.md
+  - progress.md
+  - LAPORAN_PROYEK.md
+forbidden_paths:
+  - tests/golden/**
+protected_tests:
+  - tests/golden/master_baseline.json
+acceptance:
+  - "python3 run_all_tests.py"
+stop_if:
+  - "Pass rate di bawah 100%"

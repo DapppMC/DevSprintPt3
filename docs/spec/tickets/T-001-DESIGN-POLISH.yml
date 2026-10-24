@@ -1,0 +1,19 @@
+id: T-001-DESIGN-POLISH
+goal: "Peremajaan token CSS, integrasi tokens.css, perbaikan transisi hardware-accelerated, dan optical polish sesuai DESIGN_CONSTITUTION"
+frozen:
+  tests/golden/master_baseline.json: a5490e89eb186f100ac4f85a33e2e7510fb1ec1035e4bbf988cdcd2b56e9bf78
+allowed_paths:
+  - client/src/index.css
+  - client/src/components/ui.ts
+  - client/src/components/Layout.tsx
+  - client/src/components/PageHeader.tsx
+  - docs/spec/tokens.css
+forbidden_paths:
+  - server/src/**
+  - tests/golden/**
+protected_tests:
+  - tests/golden/master_baseline.json
+acceptance:
+  - "npm run build -w client"
+stop_if:
+  - "Build client gagal atau terjadi regresi pada skrip build"

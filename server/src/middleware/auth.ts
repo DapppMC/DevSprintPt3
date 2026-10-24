@@ -70,19 +70,18 @@ const loginAttempts = new Map<string, RateLimitEntry>();
 const MAX_ATTEMPTS = 5;
 const WINDOW_MS = 15 * 60 * 1000; // 15 menit
 
-const DEMO_CREDENTIALS: Record<string, string> = {
-  cakrofi: '123456',
-  udin: '1111',
-  sari: '2222',
+const DEMO_CREDENTIALS: Record<string, string[]> = {
+  cakrofi: ['123456'],
+  udin: ['1111', '111111'],
+  sari: ['2222', '222222'],
 };
 
 export function loginRateLimiter(req: Request, _res: Response, next: NextFunction): void {
-  const { username, password } = (req.body as Record<string, unknown>) || {};
-  if (
-    username &&
-    password &&
-    DEMO_CREDENTIALS[String(username).toLowerCase().trim()] === String(password).trim()
-  ) {
+  const body = (req.body as Record<string, unknown>) || {};
+  const username = String(body.username || '').toLowerCase().trim();
+  const cred = String(body.pin || body.password || '').trim();
+
+  if (username && cred && DEMO_CREDENTIALS[username]?.includes(cred)) {
     return next();
   }
 

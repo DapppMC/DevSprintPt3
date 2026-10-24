@@ -78,7 +78,7 @@ export function DonutChart({ title, subtitle, data, centerLabel = 'Total' }: Don
                     strokeWidth={isHovered ? strokeWidth + 4 : strokeWidth}
                     strokeDasharray={strokeDasharray}
                     strokeDashoffset={strokeDashoffset}
-                    className="transition-all duration-200 cursor-pointer"
+                    className="transition-transform duration-100 ease-out duration-200 cursor-pointer"
                     onMouseEnter={() => setHoveredIdx(idx)}
                     onMouseLeave={() => setHoveredIdx(null)}
                   />
@@ -112,7 +112,7 @@ export function DonutChart({ title, subtitle, data, centerLabel = 'Total' }: Don
                 key={item.id}
                 onMouseEnter={() => setHoveredIdx(idx)}
                 onMouseLeave={() => setHoveredIdx(null)}
-                className={`flex items-center justify-between gap-3 px-3 py-1.5 rounded-lg border text-xs cursor-pointer transition-all ${
+                className={`flex items-center justify-between gap-3 px-3 py-1.5 rounded-lg border text-xs cursor-pointer transition-transform duration-100 ease-out ${
                   isHovered
                     ? 'border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 shadow-xs scale-102'
                     : 'border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-850 hover:bg-slate-50/70 dark:hover:bg-slate-800'
@@ -215,19 +215,19 @@ export function BarChart({ title, subtitle, data }: BarChartProps) {
                 <div className="w-full flex items-end justify-center gap-1 h-full pb-1">
                   {/* Inflow Bar */}
                   <div
-                    className="w-1/2 max-w-[18px] bg-emerald-600 hover:bg-emerald-500 rounded-t-sm transition-all duration-300"
+                    className="w-1/2 max-w-[18px] bg-emerald-600 hover:bg-emerald-500 rounded-t-sm transition-transform duration-100 ease-out duration-300"
                     style={{ height: `${Math.max(inflowH, 4)}%` }}
                     title={`Masuk: ${item.inflow}`}
                   />
                   {/* Outflow Bar */}
                   <div
-                    className="w-1/2 max-w-[18px] bg-blue-600 hover:bg-blue-500 rounded-t-sm transition-all duration-300"
+                    className="w-1/2 max-w-[18px] bg-blue-600 hover:bg-blue-500 rounded-t-sm transition-transform duration-100 ease-out duration-300"
                     style={{ height: `${Math.max(outflowH, 4)}%` }}
                     title={`Keluar: ${item.outflow}`}
                   />
                 </div>
 
-                <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-100 transition-colors mt-1">
+                <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-100 transition-transform duration-100 ease-out mt-1">
                   {item.label}
                 </span>
               </div>

@@ -241,14 +241,50 @@ export interface CreateGoodsReceiptInput {
   lines: CreateGoodsReceiptLineInput[];
 }
 
+export interface TopProduct {
+  id: string;
+  name: string;
+  sku: string;
+  category: string;
+  unitsSold: number;
+  revenue: number;
+}
+
+export interface DailySalesTrend {
+  date: string;
+  dayName: string;
+  totalRevenue: number;
+  transactionCount: number;
+  unitsSold: number;
+}
+
+export interface ReorderRecommendation {
+  productId: string;
+  productName: string;
+  productSku: string;
+  category: string;
+  currentStock: number;
+  lowStockThreshold: number;
+  purchaseUnit: string;
+  unitsPerPurchaseUnit: number;
+  recommendedPurchaseQty: number;
+  estimatedCost: number;
+  supplierName?: string;
+  supplierId?: string;
+}
+
 export interface Dashboard {
   totalProducts: number;
   totalUnits: number;
   todaySalesTotal: number | null;
+  todayGrossProfit?: number | null;
   lowStockCount: number;
   lowStockThreshold: number;
   latestSales?: SaleSummary[];
   lowStockProducts: Product[];
+  topProducts?: TopProduct[];
+  weeklyTrends?: DailySalesTrend[];
+  reorderRecommendations?: ReorderRecommendation[];
 }
 
 export type Role = 'PEMILIK' | 'STAF';

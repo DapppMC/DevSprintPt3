@@ -72,16 +72,16 @@ export function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col justify-center py-12 sm:px-6 lg:px-8 transition-colors duration-150 relative">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col justify-center py-12 sm:px-6 lg:px-8 transition-transform duration-100 ease-out duration-150 relative">
       {/* Theme toggle in top-right */}
       <div className="absolute top-4 right-4">
         <button
           type="button"
           onClick={toggleTheme}
           title={isDark ? 'Beralih ke Light Mode' : 'Beralih ke Dark Mode'}
-          className="rounded-lg p-2 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shadow-xs"
+          className="rounded-lg p-2 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-transform duration-100 ease-out shadow-xs"
         >
-          {isDark ? <Sun className="h-4 w-4 text-amber-400" /> : <Moon className="h-4 w-4 text-slate-600" />}
+          {isDark ? <Sun className="h-4 w-4 text-amber-400" /> : <Moon className="h-4 w-4 text-slate-600 dark:text-slate-300" />}
         </button>
       </div>
 
@@ -101,7 +101,7 @@ export function LoginPage() {
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md px-4">
-        <div className="bg-white dark:bg-slate-900 py-8 px-6 shadow-sm rounded-2xl sm:px-10 border border-slate-200/90 dark:border-slate-800 transition-colors">
+        <div className="bg-white dark:bg-slate-900 py-8 px-6 shadow-sm rounded-2xl sm:px-10 border border-slate-200/90 dark:border-slate-800 transition-transform duration-100 ease-out">
           <div className="flex items-center justify-between mb-5 pb-3 border-b border-slate-100 dark:border-slate-800">
             <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
               <ShieldCheck className="h-4 w-4 text-emerald-600 dark:text-emerald-500" /> Masuk ke Sistem
@@ -143,7 +143,7 @@ export function LoginPage() {
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="Contoh: cakrofi, udin, sari"
-                  className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/80 pl-9 pr-3 py-2 text-xs text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-emerald-600 dark:focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-600 dark:focus:ring-emerald-500 transition-colors"
+                  className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/80 pl-9 pr-3 py-2 text-xs text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-emerald-600 dark:focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-600 dark:focus:ring-emerald-500 transition-transform duration-100 ease-out"
                 />
               </div>
             </div>
@@ -165,7 +165,7 @@ export function LoginPage() {
                   value={pin}
                   onChange={(e) => setPin(e.target.value)}
                   placeholder="Masukkan PIN otentikasi"
-                  className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/80 pl-9 pr-10 py-2 text-xs text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-emerald-600 dark:focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-600 dark:focus:ring-emerald-500 transition-colors"
+                  className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/80 pl-9 pr-10 py-2 text-xs text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-emerald-600 dark:focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-600 dark:focus:ring-emerald-500 transition-transform duration-100 ease-out"
                 />
                 <button
                   type="button"
@@ -181,7 +181,7 @@ export function LoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full flex justify-center items-center py-2.5 px-4 rounded-lg shadow-xs text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 dark:hover:bg-emerald-500 active:bg-emerald-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 disabled:opacity-50 transition-all cursor-pointer"
+              className="w-full flex justify-center items-center py-2.5 px-4 rounded-lg shadow-xs text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 dark:hover:bg-emerald-500 active:bg-emerald-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 disabled:opacity-50 transition-transform duration-100 ease-out cursor-pointer"
             >
               {isLoading ? (
                 <span className="flex items-center gap-2">
@@ -205,7 +205,7 @@ export function LoginPage() {
                 type="button"
                 disabled={isLoading}
                 onClick={() => handleQuickLogin('cakrofi', '123456')}
-                className="w-full flex items-center justify-between p-2.5 rounded-xl border border-amber-200 dark:border-amber-800/80 bg-amber-50/60 dark:bg-amber-950/40 hover:bg-amber-100/70 dark:hover:bg-amber-900/50 text-left transition-all group cursor-pointer"
+                className="w-full flex items-center justify-between p-2.5 rounded-xl border border-amber-200 dark:border-amber-800/80 bg-amber-50/60 dark:bg-amber-950/40 hover:bg-amber-100/70 dark:hover:bg-amber-900/50 text-left transition-transform duration-100 ease-out group cursor-pointer"
               >
                 <div>
                   <div className="flex items-center gap-2">
@@ -227,7 +227,7 @@ export function LoginPage() {
                 type="button"
                 disabled={isLoading}
                 onClick={() => handleQuickLogin('udin', '1111')}
-                className="w-full flex items-center justify-between p-2.5 rounded-xl border border-blue-200 dark:border-blue-800/80 bg-blue-50/60 dark:bg-blue-950/40 hover:bg-blue-100/70 dark:hover:bg-blue-900/50 text-left transition-all group cursor-pointer"
+                className="w-full flex items-center justify-between p-2.5 rounded-xl border border-blue-200 dark:border-blue-800/80 bg-blue-50/60 dark:bg-blue-950/40 hover:bg-blue-100/70 dark:hover:bg-blue-900/50 text-left transition-transform duration-100 ease-out group cursor-pointer"
               >
                 <div>
                   <div className="flex items-center gap-2">
@@ -249,7 +249,7 @@ export function LoginPage() {
                 type="button"
                 disabled={isLoading}
                 onClick={() => handleQuickLogin('sari', '2222')}
-                className="w-full flex items-center justify-between p-2.5 rounded-xl border border-blue-200 dark:border-blue-800/80 bg-blue-50/60 dark:bg-blue-950/40 hover:bg-blue-100/70 dark:hover:bg-blue-900/50 text-left transition-all group cursor-pointer"
+                className="w-full flex items-center justify-between p-2.5 rounded-xl border border-blue-200 dark:border-blue-800/80 bg-blue-50/60 dark:bg-blue-950/40 hover:bg-blue-100/70 dark:hover:bg-blue-900/50 text-left transition-transform duration-100 ease-out group cursor-pointer"
               >
                 <div>
                   <div className="flex items-center gap-2">

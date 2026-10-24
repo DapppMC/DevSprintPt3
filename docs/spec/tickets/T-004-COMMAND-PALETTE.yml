@@ -1,0 +1,17 @@
+id: T-004-COMMAND-PALETTE
+goal: "Pembangunan Command Palette global (Ctrl+K) untuk navigasi kilat, pencarian produk cepat, dan shortcut tindakan operasional"
+frozen:
+  tests/golden/master_baseline.json: a5490e89eb186f100ac4f85a33e2e7510fb1ec1035e4bbf988cdcd2b56e9bf78
+allowed_paths:
+  - client/src/components/CommandPalette.tsx
+  - client/src/components/Layout.tsx
+  - client/src/App.tsx
+forbidden_paths:
+  - server/**
+  - tests/golden/**
+protected_tests:
+  - tests/golden/master_baseline.json
+acceptance:
+  - "npm run build -w client"
+stop_if:
+  - "Typecheck client gagal atau build menghasilkan error"

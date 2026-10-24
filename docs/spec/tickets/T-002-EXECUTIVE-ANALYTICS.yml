@@ -1,0 +1,20 @@
+id: T-002-EXECUTIVE-ANALYTICS
+goal: "Pengayaan endpoint dashboard dan visualisasi analitik eksekutif dengan Gross Profit, Top Selling Products, dan tren 7 hari"
+frozen:
+  tests/golden/master_baseline.json: a5490e89eb186f100ac4f85a33e2e7510fb1ec1035e4bbf988cdcd2b56e9bf78
+allowed_paths:
+  - server/src/services/dashboard.service.ts
+  - server/src/types/dto.ts
+  - client/src/types/api.ts
+  - client/src/pages/DashboardPage.tsx
+  - client/src/components/AnalyticsCharts.tsx
+forbidden_paths:
+  - server/src/services/sale.service.ts
+  - tests/golden/**
+protected_tests:
+  - tests/golden/master_baseline.json
+acceptance:
+  - "npm test"
+  - "npm run build -w client"
+stop_if:
+  - "Vitest 108 tests mengalami kegagalan"

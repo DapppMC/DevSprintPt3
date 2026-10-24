@@ -10,6 +10,8 @@ import type {
 import {
   FALLBACK_PURCHASE_ORDERS,
   FALLBACK_PURCHASE_ORDER_DETAILS,
+  FALLBACK_SUPPLIERS,
+  FALLBACK_PRODUCTS,
 } from '../lib/fallback-data';
 import { getDatabaseStatus, markDatabaseDown, markDatabaseUp } from '../lib/db-health';
 
@@ -100,8 +102,24 @@ export async function getPurchaseOrder(id: string): Promise<PurchaseOrderDetailD
     const fallback =
       FALLBACK_PURCHASE_ORDER_DETAILS[id] ||
       Object.values(FALLBACK_PURCHASE_ORDER_DETAILS).find((p) => p.orderNumber === id);
-    if (!fallback) throw new NotFoundError('Pesanan tidak ditemukan.');
-    return fallback;
+    if (fallback) return fallback;
+    const summary = FALLBACK_PURCHASE_ORDERS.find((p) => p.id === id || p.orderNumber === id);
+    if (summary) {
+      return {
+        id: summary.id,
+        orderNumber: summary.orderNumber,
+        supplierId: summary.supplierId,
+        supplierName: summary.supplierName,
+        orderedAt: summary.orderedAt,
+        note: summary.note,
+        status: summary.status,
+        cancelReason: summary.cancelReason,
+        createdAt: summary.createdAt,
+        lines: [],
+        goodsReceipts: [],
+      };
+    }
+    throw new NotFoundError('Pesanan tidak ditemukan.');
   }
 
   try {
@@ -179,8 +197,24 @@ export async function getPurchaseOrder(id: string): Promise<PurchaseOrderDetailD
   const fallback =
     FALLBACK_PURCHASE_ORDER_DETAILS[id] ||
     Object.values(FALLBACK_PURCHASE_ORDER_DETAILS).find((p) => p.orderNumber === id);
-  if (!fallback) throw new NotFoundError('Pesanan tidak ditemukan.');
-  return fallback;
+  if (fallback) return fallback;
+  const summary = FALLBACK_PURCHASE_ORDERS.find((p) => p.id === id || p.orderNumber === id);
+  if (summary) {
+    return {
+      id: summary.id,
+      orderNumber: summary.orderNumber,
+      supplierId: summary.supplierId,
+      supplierName: summary.supplierName,
+      orderedAt: summary.orderedAt,
+      note: summary.note,
+      status: summary.status,
+      cancelReason: summary.cancelReason,
+      createdAt: summary.createdAt,
+      lines: [],
+      goodsReceipts: [],
+    };
+  }
+  throw new NotFoundError('Pesanan tidak ditemukan.');
 }
 
 function mergeDuplicatePoLines(
@@ -197,6 +231,60 @@ export async function createPurchaseOrder(
   input: CreatePurchaseOrderInput,
 ): Promise<PurchaseOrderDetailDto> {
   const mergedLines = mergeDuplicatePoLines(input.lines);
+
+  if (!getDatabaseStatus()) {
+    const supplier = FALLBACK_SUPPLIERS.find((s) => s.id === input.supplierId);
+    if (!supplier) throw new NotFoundError('Supplier tidak ditemukan.');
+    const now = new Date();
+    const poNum = `PO-${now.toISOString().slice(0, 7).replace('-', '')}-${String(FALLBACK_PURCHASE_ORDERS.length + 1).padStart(3, '0')}`;
+    const newId = `po-dyn-${Date.now()}`;
+    const lines: PurchaseOrderLineDto[] = mergedLines.map((l, idx) => {
+      const prod = FALLBACK_PRODUCTS.find((p) => p.id === l.productId);
+      if (!prod) throw new NotFoundError('Produk tidak ditemukan.');
+      return {
+        id: `pol-dyn-${Date.now()}-${idx}`,
+        productId: prod.id,
+        productName: prod.name,
+        productSku: prod.sku,
+        orderedBase: l.quantity * prod.unitsPerPurchaseUnit,
+        fulfilledBase: 0,
+        cancelledBase: 0,
+        remainingBase: l.quantity * prod.unitsPerPurchaseUnit,
+        baseUnit: prod.baseUnit,
+        purchaseUnit: prod.purchaseUnit,
+        unitsPerPurchaseUnit: prod.unitsPerPurchaseUnit,
+      };
+    });
+
+    const newDetail: PurchaseOrderDetailDto = {
+      id: newId,
+      orderNumber: poNum,
+      supplierId: supplier.id,
+      supplierName: supplier.name,
+      orderedAt: now.toISOString(),
+      note: input.note ?? null,
+      status: 'OPEN',
+      cancelReason: null,
+      createdAt: now.toISOString(),
+      lines,
+      goodsReceipts: [],
+    };
+
+    FALLBACK_PURCHASE_ORDERS.unshift({
+      id: newId,
+      orderNumber: poNum,
+      supplierId: supplier.id,
+      supplierName: supplier.name,
+      orderedAt: now.toISOString(),
+      note: input.note ?? null,
+      status: 'OPEN',
+      cancelReason: null,
+      createdAt: now.toISOString(),
+      lineCount: lines.length,
+    });
+    FALLBACK_PURCHASE_ORDER_DETAILS[newId] = newDetail;
+    return newDetail;
+  }
 
   const poId = await db.$transaction(async (tx) => {
     // 1. Validate supplier

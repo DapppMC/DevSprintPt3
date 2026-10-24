@@ -1,0 +1,401 @@
+{
+  "schema": "cartography/1",
+  "repo_root": ".",
+  "engine": "regex",
+  "entrypoints": [
+    {
+      "type": "cli",
+      "handler": "__main__",
+      "path": "run_all_tests.py",
+      "line": 177
+    },
+    {
+      "type": "cli",
+      "handler": "__main__",
+      "path": "scripts/cartograph.py",
+      "line": 482
+    },
+    {
+      "type": "cli",
+      "handler": "__main__",
+      "path": "scripts/design_lint.py",
+      "line": 603
+    },
+    {
+      "type": "cli",
+      "handler": "__main__",
+      "path": "scripts/gate3/failure_signature.py",
+      "line": 13
+    },
+    {
+      "type": "cli",
+      "handler": "__main__",
+      "path": "scripts/gate3/reflect_check.py",
+      "line": 110
+    },
+    {
+      "type": "cli",
+      "handler": "__main__",
+      "path": "scripts/odcat.py",
+      "line": 258
+    },
+    {
+      "type": "cli",
+      "handler": "__main__",
+      "path": "scripts/repomap.py",
+      "line": 143
+    },
+    {
+      "type": "cli",
+      "handler": "__main__",
+      "path": "scripts/sandbox.py",
+      "line": 134
+    },
+    {
+      "type": "cli",
+      "handler": "__main__",
+      "path": "scripts/ticketc.py",
+      "line": 234
+    },
+    {
+      "type": "http_route",
+      "method": "GET",
+      "route": "/api/health",
+      "handler": "<inline>",
+      "path": "server/src/app.ts",
+      "line": 15
+    },
+    {
+      "type": "http_route",
+      "method": "GET",
+      "route": "/",
+      "handler": "<inline>",
+      "path": "server/src/routes/chat.routes.ts",
+      "line": 16
+    },
+    {
+      "type": "http_route",
+      "method": "POST",
+      "route": "/",
+      "handler": "<inline>",
+      "path": "server/src/routes/chat.routes.ts",
+      "line": 27
+    },
+    {
+      "type": "http_route",
+      "method": "POST",
+      "route": "/start-with-business/:businessId",
+      "handler": "<inline>",
+      "path": "server/src/routes/chat.routes.ts",
+      "line": 45
+    },
+    {
+      "type": "http_route",
+      "method": "GET",
+      "route": "/:id/messages",
+      "handler": "<inline>",
+      "path": "server/src/routes/chat.routes.ts",
+      "line": 145
+    },
+    {
+      "type": "http_route",
+      "method": "POST",
+      "route": "/:id/messages",
+      "handler": "<inline>",
+      "path": "server/src/routes/chat.routes.ts",
+      "line": 159
+    },
+    {
+      "type": "http_route",
+      "method": "GET",
+      "route": "/",
+      "handler": "<inline>",
+      "path": "server/src/routes/nearby.routes.ts",
+      "line": 8
+    },
+    {
+      "type": "http_route",
+      "method": "GET",
+      "route": "/:id/contact",
+      "handler": "<inline>",
+      "path": "server/src/routes/nearby.routes.ts",
+      "line": 36
+    },
+    {
+      "type": "http_route",
+      "method": "POST",
+      "route": "/run",
+      "handler": "<inline>",
+      "path": "server/src/routes/scraper.routes.ts",
+      "line": 178
+    },
+    {
+      "type": "http_route",
+      "method": "GET",
+      "route": "/runs",
+      "handler": "<inline>",
+      "path": "server/src/routes/scraper.routes.ts",
+      "line": 203
+    },
+    {
+      "type": "event",
+      "event": "connection",
+      "handler": "",
+      "path": "server/src/socket/index.ts",
+      "line": 75
+    },
+    {
+      "type": "event",
+      "event": "scraper:start",
+      "handler": "async",
+      "path": "server/src/socket/index.ts",
+      "line": 199
+    },
+    {
+      "type": "event",
+      "event": "typing",
+      "handler": "async",
+      "path": "server/src/socket/index.ts",
+      "line": 257
+    },
+    {
+      "type": "event",
+      "event": "disconnect",
+      "handler": "",
+      "path": "server/src/socket/index.ts",
+      "line": 272
+    }
+  ],
+  "top_dependencies": [
+    {
+      "symbol": "Supplier",
+      "file": "client/src/types/api.ts",
+      "pagerank_score": 0.1609,
+      "referenced_by": 16
+    },
+    {
+      "symbol": "Product",
+      "file": "client/src/types/api.ts",
+      "pagerank_score": 0.1609,
+      "referenced_by": 11
+    },
+    {
+      "symbol": "Role",
+      "file": "client/src/types/api.ts",
+      "pagerank_score": 0.1609,
+      "referenced_by": 10
+    },
+    {
+      "symbol": "CreateGoodsReceiptInput",
+      "file": "server/src/services/goods-receipt.service.ts",
+      "pagerank_score": 0.0519,
+      "referenced_by": 3
+    },
+    {
+      "symbol": "createGoodsReceipt",
+      "file": "server/src/services/goods-receipt.service.ts",
+      "pagerank_score": 0.0519,
+      "referenced_by": 3
+    },
+    {
+      "symbol": "getGoodsReceipt",
+      "file": "server/src/services/goods-receipt.service.ts",
+      "pagerank_score": 0.0519,
+      "referenced_by": 3
+    },
+    {
+      "symbol": "hasPermission",
+      "file": "server/src/services/permission.service.ts",
+      "pagerank_score": 0.0495,
+      "referenced_by": 4
+    },
+    {
+      "symbol": "getPermissionsMatrix",
+      "file": "server/src/services/permission.service.ts",
+      "pagerank_score": 0.0495,
+      "referenced_by": 3
+    },
+    {
+      "symbol": "updateRolePermissions",
+      "file": "server/src/services/permission.service.ts",
+      "pagerank_score": 0.0495,
+      "referenced_by": 3
+    },
+    {
+      "symbol": "login",
+      "file": "client/src/api/auth.ts",
+      "pagerank_score": 0.0353,
+      "referenced_by": 9
+    },
+    {
+      "symbol": "getMe",
+      "file": "client/src/api/auth.ts",
+      "pagerank_score": 0.0353,
+      "referenced_by": 3
+    },
+    {
+      "symbol": "getPermissionsMatrix",
+      "file": "client/src/api/auth.ts",
+      "pagerank_score": 0.0353,
+      "referenced_by": 3
+    },
+    {
+      "symbol": "NotFoundError",
+      "file": "server/src/lib/errors.ts",
+      "pagerank_score": 0.0342,
+      "referenced_by": 10
+    },
+    {
+      "symbol": "ConflictError",
+      "file": "server/src/lib/errors.ts",
+      "pagerank_score": 0.0342,
+      "referenced_by": 8
+    },
+    {
+      "symbol": "ForbiddenError",
+      "file": "server/src/lib/errors.ts",
+      "pagerank_score": 0.0342,
+      "referenced_by": 4
+    }
+  ],
+  "orphan_files": [
+    "server/src/lib/db.ts",
+    "server/test/helpers/db-helper.ts"
+  ],
+  "orphan_notes": {
+    "server/src/lib/db.ts": "no other file references any symbol defined here; repo uses dynamic loading (scripts/design_lint.py, server.js), so treat as unknown until verified",
+    "server/test/helpers/db-helper.ts": "no other file references any symbol defined here; repo uses dynamic loading (scripts/design_lint.py, server.js), so treat as unknown until verified"
+  },
+  "db_schema": {
+    "tables": [
+      "_applied_migrations",
+      "cascade",
+      "goodsreceipt",
+      "goodsreceiptline",
+      "product",
+      "purchaseorder",
+      "purchaseorderline",
+      "rolepermission",
+      "sale",
+      "saleitem",
+      "staff",
+      "stockmovement",
+      "supplier",
+      "user"
+    ]
+  },
+  "env_contract": [
+    "DATABASE_URL",
+    "DB_SCHEMA",
+    "JWT_SECRET",
+    "NODE_ENV",
+    "OPEN_DESIGN_DIR",
+    "PLANNER_DENY_HOSTS",
+    "PORT"
+  ],
+  "sql_calls": [
+    {
+      "path": "server/prisma/migrations/20261007000000_init/migration.sql",
+      "line": 1,
+      "sql": "-- CreateEnum CREATE TYPE \"StockMovementType\" AS ENUM ('INITIAL', 'SALE', 'ADJUSTMENT_IN', 'ADJUSTMENT_OUT'); -- CreateT"
+    },
+    {
+      "path": "server/prisma/migrations/20261007140557_add_product_deactivation/migration.sql",
+      "line": 1,
+      "sql": "-- AlterTable ALTER TABLE \"Product\" ADD COLUMN \"isActive\" BOOLEAN NOT NULL DEFAULT true;"
+    },
+    {
+      "path": "server/prisma/migrations/20261010064555_add_goods_receiving/migration.sql",
+      "line": 1,
+      "sql": "-- CreateEnum CREATE TYPE \"StockAdjustmentReason\" AS ENUM ('HITUNG_ULANG', 'RUSAK', 'KEDALUWARSA', 'HILANG', 'LAINNYA');"
+    },
+    {
+      "path": "server/prisma/migrations/20261014132929_add_auth_rbac/migration.sql",
+      "line": 1,
+      "sql": "-- CreateEnum CREATE TYPE \"Role\" AS ENUM ('PEMILIK', 'STAF'); -- CreateTable CREATE TABLE \"User\" ( \"id\" UUID NOT NULL, \""
+    },
+    {
+      "path": "server/prisma/migrations/20261014133502_add_role_permissions/migration.sql",
+      "line": 1,
+      "sql": "-- CreateTable CREATE TABLE \"RolePermission\" ( \"id\" UUID NOT NULL, \"role\" \"Role\" NOT NULL, \"permission\" TEXT NOT NULL, \""
+    },
+    {
+      "path": "server/scripts/run-migrations.cjs",
+      "line": 42,
+      "sql": "CREATE TABLE IF NOT EXISTS \"_applied_migrations\" ( \"name\" VARCHAR(255) PRIMARY KEY, \"applied_at\" TIMESTAMPTZ DEFAULT NOW"
+    },
+    {
+      "path": "server/scripts/run-migrations.cjs",
+      "line": 64,
+      "sql": "SELECT name FROM \"_applied_migrations\" WHERE name = $1;"
+    },
+    {
+      "path": "server/scripts/run-migrations.cjs",
+      "line": 75,
+      "sql": "INSERT INTO \"_applied_migrations\" (name) VALUES ($1);"
+    },
+    {
+      "path": "server/scripts/run-migrations.cjs",
+      "line": 81,
+      "sql": "SELECT COUNT(*) as count FROM \"User\";"
+    },
+    {
+      "path": "server/scripts/run-migrations.cjs",
+      "line": 87,
+      "sql": "INSERT INTO \"Staff\" (\"id\", \"name\", \"isActive\", \"createdAt\", \"updatedAt\") VALUES ('1882048b-3ab8-42f3-affe-b9506589b813',"
+    },
+    {
+      "path": "server/scripts/run-migrations.cjs",
+      "line": 100,
+      "sql": "INSERT INTO \"User\" (\"id\", \"username\", \"passwordHash\", \"name\", \"role\", \"staffId\", \"isActive\", \"createdAt\", \"updatedAt\") V"
+    },
+    {
+      "path": "server/scripts/run-migrations.cjs",
+      "line": 122,
+      "sql": "INSERT INTO \"RolePermission\" (\"id\", \"role\", \"permission\", \"createdAt\") VALUES (gen_random_uuid(), 'PEMILIK', $1, NOW()) "
+    },
+    {
+      "path": "server/scripts/run-migrations.cjs",
+      "line": 129,
+      "sql": "INSERT INTO \"RolePermission\" (\"id\", \"role\", \"permission\", \"createdAt\") VALUES (gen_random_uuid(), 'STAF', $1, NOW()) ON "
+    },
+    {
+      "path": "server/scripts/run-migrations.cjs",
+      "line": 151,
+      "sql": "INSERT INTO \"Product\" (\"id\", \"sku\", \"name\", \"category\", \"purchasePrice\", \"sellingPrice\", \"stock\", \"baseUnit\", \"purchaseU"
+    },
+    {
+      "path": "server/scripts/run-migrations.cjs",
+      "line": 159,
+      "sql": "INSERT INTO \"Supplier\" (\"id\", \"name\", \"phone\", \"isActive\", \"createdAt\", \"updatedAt\") VALUES ('3882048b-3ab8-42f3-affe-b9"
+    },
+    {
+      "path": "server/src/services/goods-receipt.service.ts",
+      "line": 301,
+      "sql": "SELECT \"id\" FROM \"PurchaseOrderLine\" WHERE \"purchaseOrderId\" = ${input.purchaseOrderId}::uuid FOR UPDATE;"
+    },
+    {
+      "path": "server/src/services/purchase-order.service.ts",
+      "line": 268,
+      "sql": "SELECT \"id\" FROM \"PurchaseOrderLine\" WHERE \"purchaseOrderId\" = ${id}::uuid FOR UPDATE;"
+    }
+  ],
+  "deprecated_calls": [],
+  "dynamic_dispatch_files": [
+    "scripts/design_lint.py",
+    "server.js"
+  ],
+  "stats": {
+    "files_scanned": 127,
+    "source_files": 120,
+    "repomap_files": 112,
+    "repomap_tokens": 1500,
+    "entrypoint_scan_skipped_files": 10
+  },
+  "limits": [
+    "Structure only: behaviour is not inferred. Verify with golden tests (Gate -1).",
+    "Regex engine is line based; multi-line calls need --engine ast-grep.",
+    "Entry points and top_dependencies ignore these folders (--include-nonprod to scan them): __fixtures__, __mocks__, __tests__, doc, docs, e2e, example, examples, fixtures, sample, samples, test, tests.",
+    "top_dependencies skips generic names (get, set, add, save, ...), dunder methods and names under 4 characters."
+  ]
+}

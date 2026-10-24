@@ -182,7 +182,7 @@ function CreatePOModal({
     <Modal title="Buat Purchase Order Baru" onClose={onClose} size="xl">
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && (
-          <div className="rounded-lg bg-rose-50 p-3 text-xs text-rose-700 border border-rose-200">
+          <div className="rounded-lg bg-rose-50 dark:bg-rose-950/40 p-3 text-xs text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800/80">
             {error}
           </div>
         )}
@@ -194,7 +194,7 @@ function CreatePOModal({
             </label>
             <button
               type="button"
-              className="text-xs text-emerald-700 hover:text-emerald-800 font-semibold underline"
+              className="text-xs text-emerald-700 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 font-semibold underline"
               onClick={() => setShowAddSupplier(true)}
             >
               + Tambah Supplier Baru
@@ -272,13 +272,13 @@ function CreatePOModal({
                       required
                     />
                   </div>
-                  <span className="w-16 font-bold text-slate-600 text-[11px]">
+                  <span className="w-16 font-bold text-slate-600 dark:text-slate-300 text-[11px]">
                     {selectedProduct?.purchaseUnit ?? 'dus'}
                   </span>
                   {lines.length > 1 && (
                     <button
                       type="button"
-                      className="text-xs text-rose-600 hover:text-rose-800 font-bold p-1"
+                      className="text-xs text-rose-600 dark:text-rose-400 hover:text-rose-800 dark:hover:text-rose-300 font-bold p-1"
                       onClick={() => removeLine(idx)}
                     >
                       Hapus
@@ -437,7 +437,7 @@ function DetailModal({ poId, onClose, onCancelRemainingClick }: DetailModalProps
                           <div className="flex items-center gap-2">
                             <div className="flex-1 bg-slate-100 dark:bg-slate-800 rounded-full h-2 overflow-hidden border border-slate-200 dark:border-slate-700">
                               <div
-                                className={`h-full rounded-full transition-all ${
+                                className={`h-full rounded-full transition-transform duration-100 ease-out ${
                                   pct >= 100 ? 'bg-emerald-600' : 'bg-amber-500'
                                 }`}
                                 style={{ width: `${pct}%` }}
@@ -475,7 +475,7 @@ function DetailModal({ poId, onClose, onCancelRemainingClick }: DetailModalProps
                         </p>
                       </div>
                     </div>
-                    <span className="font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                    <span className="font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800/80">
                       {gr.itemCount} barang masuk
                     </span>
                   </div>
@@ -485,7 +485,7 @@ function DetailModal({ poId, onClose, onCancelRemainingClick }: DetailModalProps
           )}
 
           {/* Action Footer */}
-          <div className="flex justify-between items-center pt-3 border-t border-slate-200">
+          <div className="flex justify-between items-center pt-3 border-t border-slate-200 dark:border-slate-800">
             <div>
               {can('purchase_order:manage') && (po.status === 'OPEN' || po.status === 'PARTIAL') && (
                 <button
@@ -606,7 +606,7 @@ export function PurchaseOrdersPage() {
             key={tab.id}
             type="button"
             onClick={() => setFilterStatus(tab.id as PurchaseOrderStatus | 'ALL')}
-            className={`rounded-lg px-3 py-1.5 text-xs font-bold transition-all cursor-pointer ${
+            className={`rounded-lg px-3 py-1.5 text-xs font-bold transition-transform duration-100 ease-out cursor-pointer ${
               filterStatus === tab.id
                 ? 'bg-emerald-600 text-white shadow-xs'
                 : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-750 border border-slate-200 dark:border-slate-700'
@@ -649,7 +649,7 @@ export function PurchaseOrdersPage() {
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800 bg-white dark:bg-slate-900 text-xs">
               {purchaseOrders.map((po) => {
                 return (
-                  <tr key={po.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/80 transition-colors">
+                  <tr key={po.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/80 transition-transform duration-100 ease-out">
                     <td className={`${tdClass} font-mono font-bold text-slate-900 dark:text-slate-100`}>
                       <button
                         type="button"
@@ -738,14 +738,14 @@ export function PurchaseOrdersPage() {
         >
           <form onSubmit={handleConfirmCancel} className="space-y-4 text-xs">
             {cancelError && (
-              <div className="rounded-lg bg-rose-50 p-3 text-rose-700 border border-rose-200">
+              <div className="rounded-lg bg-rose-50 dark:bg-rose-950/40 p-3 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800/80">
                 {cancelError}
               </div>
             )}
 
-            <p className="text-slate-600">
+            <p className="text-slate-600 dark:text-slate-300">
               Apakah Anda yakin ingin membatalkan sisa barang yang belum dikirim untuk PO{' '}
-              <strong className="font-mono text-slate-900">{cancelTarget.orderNumber}</strong>?
+              <strong className="font-mono text-slate-900 dark:text-slate-100">{cancelTarget.orderNumber}</strong>?
               Sisa kuantitas akan dihapus dari antrean pengiriman dan status PO akan ditutup secara transaksional.
             </p>
 

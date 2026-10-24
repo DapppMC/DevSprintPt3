@@ -433,6 +433,89 @@ export const FALLBACK_PURCHASE_ORDER_DETAILS: Record<string, PurchaseOrderDetail
       },
     ],
   },
+  'po-003': {
+    id: 'po-003',
+    orderNumber: 'PO-202610-003',
+    supplierId: 'sup-004',
+    supplierName: 'Grosir Sembako Berkah Madura',
+    orderedAt: '2026-10-20T08:00:00.000Z',
+    note: 'Pengadaan sembako beras rojolele & minyak goreng',
+    status: 'COMPLETE',
+    cancelReason: null,
+    createdAt: '2026-10-20T08:00:00.000Z',
+    lines: [
+      {
+        id: 'pol-004',
+        productId: 'prod-006',
+        productName: 'Minyak Goreng Bimoli 1L',
+        productSku: 'SMB-001',
+        orderedBase: 24,
+        fulfilledBase: 24,
+        cancelledBase: 0,
+        remainingBase: 0,
+        baseUnit: 'pcs',
+        purchaseUnit: 'pcs',
+        unitsPerPurchaseUnit: 1,
+      },
+      {
+        id: 'pol-005',
+        productId: 'prod-007',
+        productName: 'Beras Premium 5kg',
+        productSku: 'SMB-003',
+        orderedBase: 10,
+        fulfilledBase: 10,
+        cancelledBase: 0,
+        remainingBase: 0,
+        baseUnit: 'pcs',
+        purchaseUnit: 'pcs',
+        unitsPerPurchaseUnit: 1,
+      },
+    ],
+    goodsReceipts: [
+      {
+        id: 'gr-002',
+        receiptNumber: 'GR-202610-002',
+        idempotencyKey: 'idemp-gr-002',
+        purchaseOrderId: 'po-003',
+        purchaseOrderNumber: 'PO-202610-003',
+        supplierId: 'sup-004',
+        supplierName: 'Grosir Sembako Berkah Madura',
+        receivedById: 'staff-cakrofi-id',
+        receivedByName: 'Cak Rofi (Pemilik)',
+        receivedAt: '2026-10-20T11:00:00.000Z',
+        note: 'Sembako diterima lengkap dalam kondisi prima',
+        createdAt: '2026-10-20T11:00:00.000Z',
+        itemCount: 2,
+      },
+    ],
+  },
+  'po-004': {
+    id: 'po-004',
+    orderNumber: 'PO-202610-004',
+    supplierId: 'sup-002',
+    supplierName: 'PT Mayora Indah Tbk',
+    orderedAt: '2026-10-18T10:00:00.000Z',
+    note: 'Pesanan biskuit roma dan torabika',
+    status: 'CANCELLED',
+    cancelReason: 'Supplier kehabisan stok varian kopi torabika',
+    createdAt: '2026-10-18T10:00:00.000Z',
+    lines: [
+      {
+        id: 'pol-006',
+        productId: 'prod-008',
+        productName: 'Biskuit Roma Kelapa',
+        productSku: 'SNK-001',
+        orderedBase: 40,
+        fulfilledBase: 0,
+        cancelledBase: 40,
+        remainingBase: 0,
+        baseUnit: 'pcs',
+        purchaseUnit: 'pcs',
+        unitsPerPurchaseUnit: 1,
+      },
+    ],
+    goodsReceipts: [],
+  },
 };
 
 export const FALLBACK_GOODS_RECEIPTS: GoodsReceiptSummaryDto[] = [
@@ -502,6 +585,56 @@ export const FALLBACK_GOODS_RECEIPT_DETAILS: Record<string, GoodsReceiptDetailDt
       },
     ],
   },
+  'gr-002': {
+    id: 'gr-002',
+    receiptNumber: 'GR-202610-002',
+    idempotencyKey: 'idemp-gr-002',
+    purchaseOrderId: 'po-003',
+    purchaseOrderNumber: 'PO-202610-003',
+    supplierId: 'sup-004',
+    supplierName: 'Grosir Sembako Berkah Madura',
+    receivedById: 'staff-cakrofi-id',
+    receivedByName: 'Cak Rofi (Pemilik)',
+    receivedAt: '2026-10-20T11:00:00.000Z',
+    note: 'Sembako diterima lengkap dalam kondisi prima',
+    createdAt: '2026-10-20T11:00:00.000Z',
+    lines: [
+      {
+        id: 'grl-002',
+        productId: 'prod-006',
+        productName: 'Minyak Goreng Bimoli 1L',
+        productSku: 'SMB-001',
+        purchaseOrderLineId: 'pol-004',
+        receivedBase: 24,
+        rejectedBase: 0,
+        rejectReason: null,
+        rejectNote: null,
+        bonusBase: 0,
+        purchaseUnit: 'pcs',
+        unitsPerPurchaseUnit: 1,
+        unitCostPerPurchaseUnit: 17500,
+        costPerBaseUnit: 17500,
+        effectiveCostPerBaseUnit: 17500,
+      },
+      {
+        id: 'grl-003',
+        productId: 'prod-007',
+        productName: 'Beras Premium 5kg',
+        productSku: 'SMB-003',
+        purchaseOrderLineId: 'pol-005',
+        receivedBase: 10,
+        rejectedBase: 0,
+        rejectReason: null,
+        rejectNote: null,
+        bonusBase: 0,
+        purchaseUnit: 'pcs',
+        unitsPerPurchaseUnit: 1,
+        unitCostPerPurchaseUnit: 62000,
+        costPerBaseUnit: 62000,
+        effectiveCostPerBaseUnit: 62000,
+      },
+    ],
+  },
 };
 
 export const FALLBACK_SALES: SaleSummaryDto[] = [
@@ -567,18 +700,54 @@ export function getFallbackDashboard(maskFinancials = false): DashboardDto {
   const lowStock = FALLBACK_PRODUCTS.filter((p) => p.stock <= 5);
   const totalUnits = FALLBACK_PRODUCTS.reduce((acc, p) => acc + p.stock, 0);
   const todaySalesTotal = maskFinancials ? null : 102000;
+  const todayGrossProfit = maskFinancials ? null : 28500;
+
+  const topProducts = [
+    { id: 'prod-001', name: 'Indomie Goreng', sku: 'MIE-001', category: 'Makanan Instan', unitsSold: 42, revenue: 147000 },
+    { id: 'prod-003', name: 'Aqua 600 ml', sku: 'MNM-001', category: 'Minuman', unitsSold: 36, revenue: 108000 },
+    { id: 'prod-005', name: 'Kopi Kapal Api Sachet', sku: 'MNM-003', category: 'Minuman', unitsSold: 28, revenue: 42000 },
+    { id: 'prod-006', name: 'Minyak Goreng Bimoli 1L', sku: 'SMB-001', category: 'Sembako', unitsSold: 8, revenue: 156000 },
+  ];
+
+  const weeklyTrends = [
+    { date: '2026-10-18', dayName: 'Minggu', totalRevenue: 185000, transactionCount: 14, unitsSold: 56 },
+    { date: '2026-10-19', dayName: 'Senin', totalRevenue: 240000, transactionCount: 18, unitsSold: 72 },
+    { date: '2026-10-20', dayName: 'Selasa', totalRevenue: 195000, transactionCount: 15, unitsSold: 61 },
+    { date: '2026-10-21', dayName: 'Rabu', totalRevenue: 310000, transactionCount: 22, unitsSold: 88 },
+    { date: '2026-10-22', dayName: 'Kamis', totalRevenue: 265000, transactionCount: 19, unitsSold: 74 },
+    { date: '2026-10-23', dayName: 'Jumat', totalRevenue: 345000, transactionCount: 26, unitsSold: 105 },
+    { date: '2026-10-24', dayName: 'Sabtu', totalRevenue: 102000, transactionCount: 8, unitsSold: 32 },
+  ];
+
+  const reorderRecommendations = lowStock.map((p) => ({
+    productId: p.id,
+    productName: p.name,
+    productSku: p.sku,
+    category: p.category,
+    currentStock: p.stock,
+    lowStockThreshold: 5,
+    purchaseUnit: p.purchaseUnit,
+    unitsPerPurchaseUnit: p.unitsPerPurchaseUnit,
+    recommendedPurchaseQty: 2,
+    estimatedCost: 2 * (p.purchasePrice ?? 0) * p.unitsPerPurchaseUnit,
+    supplierName: 'Toko Grosir Jaya Mandiri',
+  }));
 
   return {
     totalProducts: FALLBACK_PRODUCTS.length,
     totalUnits,
     todaySalesTotal,
+    todayGrossProfit,
     lowStockCount: lowStock.length,
     lowStockThreshold: 5,
-    latestSales: maskFinancials ? [] : FALLBACK_SALES,
+    latestSales: maskFinancials ? null : FALLBACK_SALES,
     lowStockProducts: lowStock.map((p) => ({
       ...p,
       purchasePrice: maskFinancials ? undefined : p.purchasePrice,
     })),
+    topProducts: maskFinancials ? [] : topProducts,
+    weeklyTrends: maskFinancials ? [] : weeklyTrends,
+    reorderRecommendations,
   };
 }
 

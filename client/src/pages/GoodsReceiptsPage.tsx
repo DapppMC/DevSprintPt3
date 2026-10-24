@@ -301,7 +301,7 @@ function CreateReceiptModal({
     <Modal title="Penerimaan Barang Masuk (Fisik)" onClose={onClose} size="2xl">
       <form onSubmit={handleSubmit} className="space-y-4 text-xs">
         {error && (
-          <div className="rounded-lg bg-rose-50 p-3 text-rose-700 border border-rose-200">
+          <div className="rounded-lg bg-rose-50 dark:bg-rose-950/40 p-3 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800/80">
             {error}
           </div>
         )}
@@ -337,7 +337,7 @@ function CreateReceiptModal({
               {!selectedPoId && (
                 <button
                   type="button"
-                  className="text-xs text-emerald-700 hover:text-emerald-800 font-bold underline"
+                  className="text-xs text-emerald-700 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 font-bold underline"
                   onClick={() => setShowAddSupplier(true)}
                 >
                   + Supplier Baru
@@ -369,7 +369,7 @@ function CreateReceiptModal({
               {!isStaff && (
                 <button
                   type="button"
-                  className="text-xs text-emerald-700 hover:text-emerald-800 font-bold underline"
+                  className="text-xs text-emerald-700 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 font-bold underline"
                   onClick={() => setShowAddStaff(true)}
                 >
                   + Staff Baru
@@ -469,7 +469,7 @@ function CreateReceiptModal({
                         <button
                           type="button"
                           onClick={() => removeLine(idx)}
-                          className="text-xs text-rose-600 hover:text-rose-800 font-bold p-1"
+                          className="text-xs text-rose-600 dark:text-rose-400 hover:text-rose-800 dark:hover:text-rose-300 font-bold p-1"
                         >
                           Hapus
                         </button>
@@ -479,7 +479,7 @@ function CreateReceiptModal({
 
                   <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                     <div>
-                      <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1">
+                      <label className="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase block mb-1">
                         Datang ({line.purchaseUnit})
                       </label>
                       <input
@@ -493,7 +493,7 @@ function CreateReceiptModal({
                       />
                     </div>
                     <div>
-                      <label className="text-[10px] font-bold text-rose-700 uppercase block mb-1">
+                      <label className="text-[10px] font-bold text-rose-700 dark:text-rose-400 uppercase block mb-1">
                         Ditolak / Rusak
                       </label>
                       <input
@@ -506,7 +506,7 @@ function CreateReceiptModal({
                       />
                     </div>
                     <div>
-                      <label className="text-[10px] font-bold text-blue-700 uppercase block mb-1">
+                      <label className="text-[10px] font-bold text-blue-700 dark:text-blue-400 uppercase block mb-1">
                         Bonus Pabrik
                       </label>
                       <input
@@ -519,7 +519,7 @@ function CreateReceiptModal({
                       />
                     </div>
                     <div>
-                      <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1">
+                      <label className="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase block mb-1">
                         Harga / {line.purchaseUnit}
                       </label>
                       <input
@@ -534,10 +534,10 @@ function CreateReceiptModal({
                   </div>
 
                   {rejPurch > 0 && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 rounded-lg bg-rose-50/70 p-2 border border-rose-200">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 rounded-lg bg-rose-50/70 dark:bg-rose-950/40 p-2 border border-rose-200 dark:border-rose-800/80">
                       <div>
-                        <label className="text-[10px] font-bold text-rose-800 uppercase block mb-1">
-                          Alasan Penolakan <span className="text-rose-600">*</span>
+                        <label className="text-[10px] font-bold text-rose-800 dark:text-rose-300 uppercase block mb-1">
+                          Alasan Penolakan <span className="text-rose-600 dark:text-rose-400">*</span>
                         </label>
                         <select
                           className={inputClass}
@@ -554,7 +554,7 @@ function CreateReceiptModal({
                         </select>
                       </div>
                       <div>
-                        <label className="text-[10px] font-bold text-rose-800 uppercase block mb-1">
+                        <label className="text-[10px] font-bold text-rose-800 dark:text-rose-300 uppercase block mb-1">
                           Catatan Rinci Penolakan
                         </label>
                         <input
@@ -714,28 +714,28 @@ function DetailModal({ receiptId, onClose }: DetailModalProps) {
                       </span>
                     </div>
 
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 border-t border-slate-100">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 border-t border-slate-100 dark:border-slate-800">
                       <div>
-                        <span className="text-slate-400 text-[10px] uppercase font-bold">Datang</span>
-                        <p className="font-bold text-slate-800 font-mono">
+                        <span className="text-slate-400 dark:text-slate-500 text-[10px] uppercase font-bold">Datang</span>
+                        <p className="font-bold text-slate-800 dark:text-slate-200 font-mono">
                           {formatNumber(line.receivedBase)} pcs
                         </p>
                       </div>
                       <div>
-                        <span className="text-slate-400 text-[10px] uppercase font-bold">Ditolak</span>
+                        <span className="text-slate-400 dark:text-slate-500 text-[10px] uppercase font-bold">Ditolak</span>
                         <p
                           className={`font-bold font-mono ${
-                            line.rejectedBase > 0 ? 'text-rose-700' : 'text-slate-600'
+                            line.rejectedBase > 0 ? 'text-rose-700 dark:text-rose-400' : 'text-slate-600 dark:text-slate-400'
                           }`}
                         >
                           {formatNumber(line.rejectedBase)} pcs {line.rejectReason ? `(${line.rejectReason})` : ''}
                         </p>
                       </div>
                       <div>
-                        <span className="text-slate-400 text-[10px] uppercase font-bold">Bonus</span>
+                        <span className="text-slate-400 dark:text-slate-500 text-[10px] uppercase font-bold">Bonus</span>
                         <p
                           className={`font-bold font-mono ${
-                            line.bonusBase > 0 ? 'text-blue-700' : 'text-slate-600'
+                            line.bonusBase > 0 ? 'text-blue-700 dark:text-blue-400' : 'text-slate-600 dark:text-slate-400'
                           }`}
                         >
                           {formatNumber(line.bonusBase)} pcs
@@ -883,7 +883,7 @@ export function GoodsReceiptsPage() {
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 bg-white dark:bg-slate-900/60 text-xs">
               {receipts.map((gr) => (
-                <tr key={gr.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
+                <tr key={gr.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-transform duration-100 ease-out">
                   <td className={`${tdClass} font-mono font-bold text-slate-900 dark:text-slate-100`}>
                     <button
                       type="button"

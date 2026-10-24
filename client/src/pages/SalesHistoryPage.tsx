@@ -97,7 +97,7 @@ export function SalesHistoryPage() {
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 bg-white dark:bg-slate-900/60 text-xs">
               {sales.map((sale) => (
-                <tr key={sale.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
+                <tr key={sale.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-transform duration-100 ease-out">
                   <td className={`${tdClass} font-mono font-bold text-slate-900 dark:text-slate-100`}>
                     <button
                       type="button"
@@ -127,7 +127,7 @@ export function SalesHistoryPage() {
                       </button>
                       <Link
                         to={`/riwayat-penjualan/${sale.id}`}
-                        className="rounded-md bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/60 px-2 py-1 text-xs font-bold text-emerald-800 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 transition-colors"
+                        className="rounded-md bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/60 px-2 py-1 text-xs font-bold text-emerald-800 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 transition-transform duration-100 ease-out"
                       >
                         Halaman Faktur
                       </Link>
@@ -233,7 +233,7 @@ export function SalesHistoryPage() {
               <div className="flex justify-between items-center pt-2 border-t border-slate-200">
                 <Link
                   to={`/riwayat-penjualan/${activeSaleDetail.id}`}
-                  className="rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-emerald-700 transition-colors"
+                  className="rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-emerald-700 transition-transform duration-100 ease-out"
                 >
                   Buka Halaman Penuh Nota
                 </Link>
